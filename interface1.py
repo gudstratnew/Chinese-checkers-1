@@ -5,6 +5,10 @@ from pygame.locals import *
 import sys
 import interface2
 import help
+import os
+
+os.chdir("./Final Project/Chinese-checkers-1")
+
 def window1():
     color_light = (202, 203, 213 )
 
@@ -13,9 +17,9 @@ def window1():
     pygame.init()
     window =pygame.display.set_mode((900, 600))
 
-    image = pygame.image.load("back.png")
+    image = pygame.image.load("./imgs/back.png")
     image = image.convert()
-    smallfont1 = pygame.font.Font('december-holidays.ttf', 100)
+    smallfont1 = pygame.font.Font('./fonts/december-holidays.ttf', 100)
     text1 = smallfont1.render('CHINESE CHECKERS', True, (5, 8, 119 ))
     textRect1 = text1.get_rect()
     textRect1.center = (460, 120)

@@ -133,7 +133,7 @@ def SixPlayers():
                         rect = pygame.Rect(j * CELL_SIZE, i * CELL_SIZE, CELL_SIZE, CELL_SIZE)
                         pions_rect.append(pygame.draw.rect(screen, colors[int(matrix[i][j])], rect, border_radius=20))
                     if [i, j] in moves:
-                        test_cercle = pygame.image.load('cercle.png')
+                        test_cercle = pygame.image.load('./imgs/cercle.png')
                         test_cercle = pygame.transform.scale(test_cercle, (CELL_SIZE, CELL_SIZE))
                         screen.blit(test_cercle, (j * CELL_SIZE, i * CELL_SIZE))
 
