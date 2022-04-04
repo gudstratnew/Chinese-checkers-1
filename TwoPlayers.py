@@ -192,6 +192,7 @@ def TwoPlayers():
         textSurf, textRect = text_objects(msg, smallText)
         textRect.center = ((x + (w / 2)), (y + (h / 2)))
         screen.blit(textSurf, textRect)
+
     while game_on:
         # player turn
         if player_index == 2: col = 'green'
@@ -207,43 +208,54 @@ def TwoPlayers():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
 
-                # get a list of all sprites that are under the mouse cursor
-                clicked_sprites = [s for s in pions_rect if s.collidepoint(pos)]
+                if (pos[0] >= 300 and pos[0] <= 390 and pos[1] > 430 and pos[1] < 470):
+                    last_jumped = [-1, -1]
+                    player_index = (player_index+1) % 3
+                    if player_index == 0:
+                        player_index += 1
+                    last_selected_token = []
+                    player_valid_moves = []
+                    screen.fill(pygame.Color("white"))
+                    animation()
 
-                if clicked_sprites:
-                    clicked_token = get_token_coor(clicked_sprites[0].x, clicked_sprites[0].y)
-                    if matrix[clicked_token[0], clicked_token[1]] == player_index and last_jumped == [-1, -1] or clicked_token == last_jumped:
-                        if clicked_token == last_selected_token:
+                else:
+                    # get a list of all sprites that are under the mouse cursor
+                    clicked_sprites = [s for s in pions_rect if s.collidepoint(pos)]
+
+                    if clicked_sprites:
+                        clicked_token = get_token_coor(clicked_sprites[0].x, clicked_sprites[0].y)
+                        if matrix[clicked_token[0], clicked_token[1]] == player_index and last_jumped == [-1, -1] or clicked_token == last_jumped:
+                            if clicked_token == last_selected_token:
+                                is_selecting = False
+                                last_selected_token = []
+                                player_valid_moves = []
+                                screen.fill(pygame.Color("white"))
+                                animation()
+                            else:
+                                player_valid_moves = valid_moves(clicked_token)
+                                last_selected_token = clicked_token
+                                is_selecting = True
+                                screen.fill(pygame.Color("white"))
+                                animation(player_valid_moves,last_selected_token)
+                        elif clicked_token in player_valid_moves:
+                            move(last_selected_token, clicked_token)
+                            winner()
+                            if (abs(clicked_token[0]-last_selected_token[0]) + abs(clicked_token[1]-last_selected_token[1]) < 4):
+                                last_jumped = [-1, -1]
+                                player_index = (player_index+1) % 3
+                                if player_index == 0:
+                                    player_index += 1
+                            else:
+                                last_jumped = clicked_token
                             is_selecting = False
                             last_selected_token = []
                             player_valid_moves = []
                             screen.fill(pygame.Color("white"))
+                            
                             animation()
-                        else:
-                            player_valid_moves = valid_moves(clicked_token)
-                            last_selected_token = clicked_token
-                            is_selecting = True
-                            screen.fill(pygame.Color("white"))
-                            animation(player_valid_moves,last_selected_token)
-                    elif clicked_token in player_valid_moves:
-                        move(last_selected_token, clicked_token)
-                        winner()
-                        if (abs(clicked_token[0]-last_selected_token[0]) + abs(clicked_token[1]-last_selected_token[1]) < 4):
-                            last_jumped = [-1, -1]
-                            player_index = (player_index+1) % 3
-                            if player_index == 0:
-                                player_index += 1
-                        else:
-                            last_jumped = clicked_token
-                        is_selecting = False
-                        last_selected_token = []
-                        player_valid_moves = []
-                        screen.fill(pygame.Color("white"))
-                        
-                        animation()
-                        
 
             button("back",400, 430, 70, 30, color_dark, color_light, interface2.window2)
+            button("End turn",300, 430, 90, 40, color_dark, color_light)
             rect2 = pygame.draw.rect(screen, color_dark, pygame.Rect(394, 424, 82, 42), 6, 20)
 
 
