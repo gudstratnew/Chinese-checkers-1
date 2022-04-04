@@ -7,6 +7,9 @@ color_dark = (2, 6, 145)
 def TwoPlayers():
     pygame.init()
     import numpy
+
+    last_jumped = [-1, -1]
+
     # remplir la matrice avec des 1
     matrix = numpy.ones((17, 25))
     # remplir la matrice avec des -1
@@ -17,6 +20,7 @@ def TwoPlayers():
     second_player = [[16, 12], [15, 11], [15, 13], [14, 10], [14, 12], [14, 14], [13, 9], [13, 11], [13, 13], [13, 15]]
     # des indexs pour le deplacement
     move_index = [[-1, -1], [-1, 1], [0, 2], [1, 1], [1, -1], [0, -2]]
+
     #modification de la matrice
     #changer des -1 par des 0 pour les cases de l'etoile
     matrix_index = [1, 2, 3, 4, 13, 12, 11, 10, 9]
@@ -64,7 +68,6 @@ def TwoPlayers():
     def valid_moves(coor):
         valid_index = []
         for i in range(len(move_index)):
-
             x = coor[0] + move_index[i][0]
             y = coor[1] + move_index[i][1]
             if -1 < x < 17 and -1 < y < 25:
@@ -72,7 +75,6 @@ def TwoPlayers():
                     valid_index.append([x, y])
                 elif matrix[x][y] != -1:
                     check_path(move_index[i], x, y, valid_index)
-
         return valid_index
 
     # les sauts possibles
@@ -210,7 +212,7 @@ def TwoPlayers():
 
                 if clicked_sprites:
                     clicked_token = get_token_coor(clicked_sprites[0].x, clicked_sprites[0].y)
-                    if matrix[clicked_token[0], clicked_token[1]] == player_index:
+                    if matrix[clicked_token[0], clicked_token[1]] == player_index and last_jumped == [-1, -1] or clicked_token == last_jumped:
                         if clicked_token == last_selected_token:
                             is_selecting = False
                             last_selected_token = []
@@ -226,15 +228,20 @@ def TwoPlayers():
                     elif clicked_token in player_valid_moves:
                         move(last_selected_token, clicked_token)
                         winner()
+                        if (abs(clicked_token[0]-last_selected_token[0]) + abs(clicked_token[1]-last_selected_token[1]) < 4):
+                            last_jumped = [-1, -1]
+                            player_index = (player_index+1) % 3
+                            if player_index == 0:
+                                player_index += 1
+                        else:
+                            last_jumped = clicked_token
                         is_selecting = False
                         last_selected_token = []
                         player_valid_moves = []
                         screen.fill(pygame.Color("white"))
-                        player_index = (player_index+1) % 3
-                        if player_index == 0:
-                            player_index += 1
-
+                        
                         animation()
+                        
 
             button("back",400, 430, 70, 30, color_dark, color_light, interface2.window2)
             rect2 = pygame.draw.rect(screen, color_dark, pygame.Rect(394, 424, 82, 42), 6, 20)
