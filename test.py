@@ -6,4 +6,6 @@ import os
 
 os.chdir("./Final Project/Chinese-checkers-1")
 
-TwoPlayers.TwoPlayers()
+#ai: ai player
+#h: human player
+TwoPlayers.TwoPlayers("ai", "h")

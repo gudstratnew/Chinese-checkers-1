@@ -1,10 +1,13 @@
+from asyncio.windows_events import NULL
+import copy
+from numpy import Inf
 import pygame
 import sys
 import interface2
 
 color_light = (202, 203, 213 )
 color_dark = (2, 6, 145)
-def TwoPlayers():
+def TwoPlayers(p1, p2):
     pygame.init()
     import numpy
 
@@ -174,6 +177,81 @@ def TwoPlayers():
     player_valid_moves = []
     last_selected_token = []
 
+    def heuristic(state, players):
+        #player array format: [[player id, player goal destination]]
+        temp = 0
+        for i in range(len(state)):
+            for j in range(len(state[i])):
+                for k in players:
+                    """
+                    if state[i][j] == k[0] and k[0] == 1:
+                        temp -= (k[1][0]-i + abs(k[1][1]-j))
+                    elif state[i][j] == k[0] and k[0] == 2:
+                        temp -= (k[1][0]-i - abs(k[1][1]-j))
+                    """
+                    if state[i][j] == k[0]:
+                        temp -= (k[1][0]-i)
+        #returned heuristic is a simple number instead of a vector for two players
+        return temp
+
+    def alpha_beta_reg(state1, toMoveId):
+        state = copy.deepcopy(state1)
+        firstPlayer = []
+        secondPlayer = []
+        for i in range(len(state)):
+            for j in range(len(state[i])):
+                if state[i][j] == 1:
+                    firstPlayer.append([i, j])
+                elif state[i][j] == 2:
+                    secondPlayer.append([i, j])
+        #value: [value, move]
+        if (toMoveId == 1):
+            value = max_value(state, firstPlayer, secondPlayer, -Inf, Inf, 1)
+        elif (toMoveId == 2):
+            value = min_value(state, firstPlayer, secondPlayer, -Inf, Inf, 1)
+        return [value[1], value[2]]
+
+    def max_value(state, p1, p2, alpha, beta, depth):
+        if (depth >= 4):
+            return [heuristic(state, [[1, [16, 12]], [2, [0, 12]]]), NULL]
+        v = -Inf
+        move = [-1, -1]
+        initial = [-1, -1]
+        for i in p1:
+            player_valid_moves = valid_moves(i)
+            for a in player_valid_moves:
+                v2 = min_value(move2(state, i, a), p1, p2, alpha, beta, depth+1)
+                if (v2[0] > v):
+                    v = v2[0]
+                    move = a
+                    initial = i
+                    if (v > alpha): alpha = v
+                if (v >= beta): return [v, move, initial]
+        return [v, move, initial]
+
+    def min_value(state, p1, p2, alpha, beta, depth):
+        if (depth >= 4):
+            return [heuristic(state, [[1, [16, 12]], [2, [0, 12]]]), NULL]
+        v = +Inf
+        move = [-1, -1]
+        initial = [-1, -1]
+        for i in p2:
+            player_valid_moves = valid_moves(i)
+            for a in player_valid_moves:
+                v2 = max_value(move2(state, i, a), p1, p2, alpha, beta, depth+1)
+                if (v2[0] < v):
+                    v = v2[0]
+                    move = a
+                    initial = i
+                    if (v < beta): beta = v
+                if (v <= alpha): return [v, move, initial]
+            return [v, move, initial]
+
+    def move2(matrix, pos, target):
+        matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
+        matrix[pos[0]][pos[1]] = 0
+        return matrix
+    
     # fonction boutton pour le retour a la fenetre precedente
     def text_objects(text, font):
         textsurface =font.render(text,True , "white")
@@ -199,60 +277,84 @@ def TwoPlayers():
         if player_index == 1: col = 'red'
         if (winner() == False):
             WriteText('Player ' + str(player_index) + '\'s Turn', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 100, 50, col)
+        
+        if (player_index == 1 and p1 == "ai"):
+            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+            temp = alpha_beta_reg(matrix, 1)
+            print(temp)
+            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+            move(temp[1], temp[0])
+            player_index = (player_index+1) % 3
+            if player_index == 0:
+                player_index += 1
+            screen.fill(pygame.Color("white"))
+            animation()
+        elif (player_index == 2 and p2 == "ai"):
+            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+            temp = alpha_beta_reg(matrix, 2)
+            print(temp)
+            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+            move(temp[1], temp[0])
+            player_index = (player_index+1) % 3
+            if player_index == 0:
+                player_index += 1
+            screen.fill(pygame.Color("white"))
+            animation()
+        else:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pos = pygame.mouse.get_pos()
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos()
+                    if (pos[0] >= 300 and pos[0] <= 390 and pos[1] > 430 and pos[1] < 470):
+                        last_jumped = [-1, -1]
+                        player_index = (player_index+1) % 3
+                        if player_index == 0:
+                            player_index += 1
+                        last_selected_token = []
+                        player_valid_moves = []
+                        screen.fill(pygame.Color("white"))
+                        animation()
 
-                if (pos[0] >= 300 and pos[0] <= 390 and pos[1] > 430 and pos[1] < 470):
-                    last_jumped = [-1, -1]
-                    player_index = (player_index+1) % 3
-                    if player_index == 0:
-                        player_index += 1
-                    last_selected_token = []
-                    player_valid_moves = []
-                    screen.fill(pygame.Color("white"))
-                    animation()
+                    else:
+                        # get a list of all sprites that are under the mouse cursor
+                        clicked_sprites = [s for s in pions_rect if s.collidepoint(pos)]
 
-                else:
-                    # get a list of all sprites that are under the mouse cursor
-                    clicked_sprites = [s for s in pions_rect if s.collidepoint(pos)]
-
-                    if clicked_sprites:
-                        clicked_token = get_token_coor(clicked_sprites[0].x, clicked_sprites[0].y)
-                        if matrix[clicked_token[0], clicked_token[1]] == player_index and last_jumped == [-1, -1] or clicked_token == last_jumped:
-                            if clicked_token == last_selected_token:
+                        if clicked_sprites:
+                            clicked_token = get_token_coor(clicked_sprites[0].x, clicked_sprites[0].y)
+                            if matrix[clicked_token[0], clicked_token[1]] == player_index and last_jumped == [-1, -1] or clicked_token == last_jumped:
+                                if clicked_token == last_selected_token:
+                                    is_selecting = False
+                                    last_selected_token = []
+                                    player_valid_moves = []
+                                    screen.fill(pygame.Color("white"))
+                                    animation()
+                                else:
+                                    player_valid_moves = valid_moves(clicked_token)
+                                    last_selected_token = clicked_token
+                                    is_selecting = True
+                                    screen.fill(pygame.Color("white"))
+                                    animation(player_valid_moves,last_selected_token)
+                            elif clicked_token in player_valid_moves:
+                                move(last_selected_token, clicked_token)
+                                print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+                                winner()
+                                if (abs(clicked_token[0]-last_selected_token[0]) + abs(clicked_token[1]-last_selected_token[1]) < 4):
+                                    last_jumped = [-1, -1]
+                                    player_index = (player_index+1) % 3
+                                    if player_index == 0:
+                                        player_index += 1
+                                else:
+                                    last_jumped = clicked_token
                                 is_selecting = False
                                 last_selected_token = []
                                 player_valid_moves = []
                                 screen.fill(pygame.Color("white"))
+                                
                                 animation()
-                            else:
-                                player_valid_moves = valid_moves(clicked_token)
-                                last_selected_token = clicked_token
-                                is_selecting = True
-                                screen.fill(pygame.Color("white"))
-                                animation(player_valid_moves,last_selected_token)
-                        elif clicked_token in player_valid_moves:
-                            move(last_selected_token, clicked_token)
-                            winner()
-                            if (abs(clicked_token[0]-last_selected_token[0]) + abs(clicked_token[1]-last_selected_token[1]) < 4):
-                                last_jumped = [-1, -1]
-                                player_index = (player_index+1) % 3
-                                if player_index == 0:
-                                    player_index += 1
-                            else:
-                                last_jumped = clicked_token
-                            is_selecting = False
-                            last_selected_token = []
-                            player_valid_moves = []
-                            screen.fill(pygame.Color("white"))
-                            
-                            animation()
 
             button("back",400, 430, 70, 30, color_dark, color_light, interface2.window2)
             button("End turn",300, 430, 90, 40, color_dark, color_light)
