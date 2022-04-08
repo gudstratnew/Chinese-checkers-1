@@ -1,5 +1,6 @@
 from asyncio.windows_events import NULL
 import copy
+from re import I
 from numpy import Inf
 import pygame
 import sys
@@ -183,68 +184,74 @@ def TwoPlayers(p1, p2):
         for i in range(len(state)):
             for j in range(len(state[i])):
                 for k in players:
-                    """
+                    
                     if state[i][j] == k[0] and k[0] == 1:
                         temp -= (k[1][0]-i + abs(k[1][1]-j))
                     elif state[i][j] == k[0] and k[0] == 2:
                         temp -= (k[1][0]-i - abs(k[1][1]-j))
-                    """
-                    if state[i][j] == k[0]:
-                        temp -= (k[1][0]-i)
+                    
+                    #if state[i][j] == k[0]:
+                        #temp -= (k[1][0]-i)
         #returned heuristic is a simple number instead of a vector for two players
         return temp
 
+
     def alpha_beta_reg(state1, toMoveId):
         state = copy.deepcopy(state1)
-        firstPlayer = []
-        secondPlayer = []
+        if (toMoveId == 1):
+            value = max_value(state, -Inf, Inf, 1)
+        elif (toMoveId == 2):
+            value = min_value(state, -Inf, Inf, 1)
+        return [value[1], value[2]]
+
+    def max_value(state, alpha, beta, depth):
+        p1 = []
         for i in range(len(state)):
             for j in range(len(state[i])):
                 if state[i][j] == 1:
-                    firstPlayer.append([i, j])
-                elif state[i][j] == 2:
-                    secondPlayer.append([i, j])
-        #value: [value, move]
-        if (toMoveId == 1):
-            value = max_value(state, firstPlayer, secondPlayer, -Inf, Inf, 1)
-        elif (toMoveId == 2):
-            value = min_value(state, firstPlayer, secondPlayer, -Inf, Inf, 1)
-        return [value[1], value[2]]
-
-    def max_value(state, p1, p2, alpha, beta, depth):
+                    p1.append([i, j])
         if (depth >= 4):
-            return [heuristic(state, [[1, [16, 12]], [2, [0, 12]]]), NULL]
+            return [heuristic(state, [[1, [16, 12]], [2, [0, 12]]]), NULL, NULL]
         v = -Inf
         move = [-1, -1]
         initial = [-1, -1]
         for i in p1:
             player_valid_moves = valid_moves(i)
+            print(i, player_valid_moves)
             for a in player_valid_moves:
-                v2 = min_value(move2(state, i, a), p1, p2, alpha, beta, depth+1)
+                v2 = min_value(move2(state, i, a), alpha, beta, depth+1)
                 if (v2[0] > v):
                     v = v2[0]
                     move = a
                     initial = i
                     if (v > alpha): alpha = v
-                if (v >= beta): return [v, move, initial]
+                if (v >= beta):
+                    return [v, move, initial]
         return [v, move, initial]
 
-    def min_value(state, p1, p2, alpha, beta, depth):
+    def min_value(state, alpha, beta, depth):
+        p2 = []
+        for i in range(len(state)):
+            for j in range(len(state[i])):
+                if state[i][j] == 2:
+                    p2.append([i, j])
         if (depth >= 4):
-            return [heuristic(state, [[1, [16, 12]], [2, [0, 12]]]), NULL]
+            return [heuristic(state, [[1, [16, 12]], [2, [0, 12]]]), NULL, NULL]
         v = +Inf
         move = [-1, -1]
         initial = [-1, -1]
         for i in p2:
             player_valid_moves = valid_moves(i)
+            print(i, player_valid_moves)
             for a in player_valid_moves:
-                v2 = max_value(move2(state, i, a), p1, p2, alpha, beta, depth+1)
+                v2 = max_value(move2(state, i, a), alpha, beta, depth+1)
                 if (v2[0] < v):
                     v = v2[0]
                     move = a
                     initial = i
                     if (v < beta): beta = v
-                if (v <= alpha): return [v, move, initial]
+                if (v <= alpha): 
+                    return [v, move, initial]
             return [v, move, initial]
 
     def move2(matrix, pos, target):
