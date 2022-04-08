@@ -174,6 +174,9 @@ def TwoPlayers(p1, p2):
 
     players = remplissage()
 
+    player_1_goals = [(16,12), (15,11), (15,13), (14,10), (14,12), (14,14), (13,9), (13,11), (13,13), (13,15)] # goals hard-coded for easier access -- it's not like they will change
+    player_2_goals = [(0,12), (1,11), (1,13), (2,10), (2,12), (2,14), (3,9), (3,11), (3,13), (3,15)] 
+
     screen.fill(pygame.Color("white"))
     players.pion()
     player_index = 1
@@ -181,7 +184,69 @@ def TwoPlayers(p1, p2):
     player_valid_moves = []
     last_selected_token = []
 
+
+
+    def distance(target, destination):
+        # literally just pythagorean theorem :)
+        return math.sqrt((target[0] - destination[0])**2 + (target[1] - destination[1])**2)
+
     def heuristic(state, players):
+        heuristic_value = 0
+        player_1_pawns = []
+        player_2_pawns = []
+
+        # go through the whole board and get each player's pawns
+        for i in range(len(state)):
+            for j in range(len(state[i])):
+                for k in players:
+                    if state[i][j] == k[0] and k[0] == 1:
+                        bigTuple = (i,j)
+                        player_1_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 2:
+                        bigTuple = (i,j)
+                        player_2_pawns.append(bigTuple)
+        #now the pawns arrays have all known pawns
+        print("==== boii ====")
+        print(str(player_1_pawns))
+        print(str(player_2_pawns))
+
+        #update for player1
+        for goal in player_1_goals:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_1_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            print("for goal " + str(goal) + " we add " + str(lowestDistance) + " From " + str(closestPawn))
+            heuristic_value += lowestDistance
+            print("heuristic value is " + str(heuristic_value))
+            player_1_pawns.remove(closestPawn)
+
+
+        player2Val = 0
+        #update for player2
+        for goal in player_2_goals:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_2_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            print("for goal " + str(goal) + " we subtract " + str(lowestDistance) + " From " + str(closestPawn))
+            player2Val -= lowestDistance
+            print("player2Val value is " + str(player2Val))
+            player_2_pawns.remove(closestPawn)
+
+        heuristic_value = heuristic_value + player2Val
+        print("heuristic_value is " + str(heuristic_value))
+
+        return heuristic_value
+
+
+    def oldHeuristic(state, players):
         #player array format: [[player id, player goal destination]]
         temp = 0
         for i in range(len(state)):
