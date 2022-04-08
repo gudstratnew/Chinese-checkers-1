@@ -2,10 +2,10 @@ import pygame
 import sys
 import TwoPlayers
 
-import os
+#import os
 
-os.chdir("./Final Project/Chinese-checkers-1")
+#os.chdir("./Final Project/Chinese-checkers-1")
 
 #ai: ai player
 #h: human player
-TwoPlayers.TwoPlayers("h", "ai")
+TwoPlayers.TwoPlayers("ai", "ai")

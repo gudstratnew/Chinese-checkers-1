@@ -7,6 +7,8 @@ import sys
 import interface2
 import math
 
+SEARCH_DEPTH = 2
+
 color_light = (202, 203, 213 )
 color_dark = (2, 6, 145)
 def TwoPlayers(p1, p2):
@@ -186,9 +188,9 @@ def TwoPlayers(p1, p2):
             for j in range(len(state[i])):
                 for k in players:
                     if state[i][j] == k[0] and k[0] == 1:
-                        temp += math.sqrt((k[1][0]-i)**2 + (k[1][1]-j)**2)
-                    elif state[i][j] == k[0] and k[0] == 2:
                         temp -= math.sqrt((k[1][0]-i)**2 + (k[1][1]-j)**2)
+                    elif state[i][j] == k[0] and k[0] == 2:
+                        temp += math.sqrt((k[1][0]-i)**2 + (k[1][1]-j)**2)
                     
                     #if state[i][j] == k[0]:
                         #temp -= (k[1][0]-i)
@@ -210,7 +212,7 @@ def TwoPlayers(p1, p2):
             for j in range(len(state[i])):
                 if state[i][j] == 1:
                     p1.append([i, j])
-        if (depth >= 4):
+        if (depth >= SEARCH_DEPTH):
             return [heuristic(state, [[1, [16, 12]], [2, [0, 12]]]), NULL, NULL]
         v = -Inf
         move = [-1, -1]
@@ -235,7 +237,7 @@ def TwoPlayers(p1, p2):
             for j in range(len(state[i])):
                 if state[i][j] == 2:
                     p2.append([i, j])
-        if (depth >= 4):
+        if (depth >= SEARCH_DEPTH):
             return [heuristic(state, [[1, [16, 12]], [2, [0, 12]]]), NULL, NULL]
         v = +Inf
         move = [-1, -1]
@@ -254,7 +256,8 @@ def TwoPlayers(p1, p2):
                     return [v, move, initial]
             return [v, move, initial]
 
-    def move2(matrix, pos, target):
+    def move2(mx, pos, target):
+        matrix = copy.deepcopy(mx)
         matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
         matrix[pos[0]][pos[1]] = 0
         return matrix
