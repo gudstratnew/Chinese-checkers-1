@@ -5,6 +5,7 @@ from numpy import Inf
 import pygame
 import sys
 import interface2
+import math
 
 color_light = (202, 203, 213 )
 color_dark = (2, 6, 145)
@@ -184,11 +185,10 @@ def TwoPlayers(p1, p2):
         for i in range(len(state)):
             for j in range(len(state[i])):
                 for k in players:
-                    
                     if state[i][j] == k[0] and k[0] == 1:
-                        temp -= (k[1][0]-i + abs(k[1][1]-j))
+                        temp += math.sqrt((k[1][0]-i)**2 + (k[1][1]-j)**2)
                     elif state[i][j] == k[0] and k[0] == 2:
-                        temp -= (k[1][0]-i - abs(k[1][1]-j))
+                        temp -= math.sqrt((k[1][0]-i)**2 + (k[1][1]-j)**2)
                     
                     #if state[i][j] == k[0]:
                         #temp -= (k[1][0]-i)
@@ -289,8 +289,8 @@ def TwoPlayers(p1, p2):
             print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             temp = alpha_beta_reg(matrix, 1)
             print(temp)
-            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             move(temp[1], temp[0])
+            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             player_index = (player_index+1) % 3
             if player_index == 0:
                 player_index += 1
@@ -300,8 +300,8 @@ def TwoPlayers(p1, p2):
             print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             temp = alpha_beta_reg(matrix, 2)
             print(temp)
-            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             move(temp[1], temp[0])
+            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             player_index = (player_index+1) % 3
             if player_index == 0:
                 player_index += 1
