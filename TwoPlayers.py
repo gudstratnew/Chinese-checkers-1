@@ -1,4 +1,4 @@
-from asyncio.windows_events import NULL
+NULL = 0
 import copy
 from re import I
 from numpy import Inf
