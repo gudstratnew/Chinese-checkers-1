@@ -8,4 +8,4 @@ import TwoPlayers
 
 #ai: ai player
 #h: human player
-TwoPlayers.TwoPlayers("ai", "ai")
+TwoPlayers.TwoPlayers("h", "h")

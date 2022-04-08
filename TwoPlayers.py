@@ -219,11 +219,10 @@ def TwoPlayers(p1, p2):
                 if dist < lowestDistance:
                     closestPawn = pawn
                     lowestDistance = dist
-            print("for goal " + str(goal) + " we add " + str(lowestDistance) + " From " + str(closestPawn))
             heuristic_value += lowestDistance
-            print("heuristic value is " + str(heuristic_value))
             player_1_pawns.remove(closestPawn)
 
+        print("heuristic value is " + str(heuristic_value))
 
         player2Val = 0
         #update for player2
@@ -235,12 +234,66 @@ def TwoPlayers(p1, p2):
                 if dist < lowestDistance:
                     closestPawn = pawn
                     lowestDistance = dist
-            print("for goal " + str(goal) + " we subtract " + str(lowestDistance) + " From " + str(closestPawn))
             player2Val -= lowestDistance
-            print("player2Val value is " + str(player2Val))
             player_2_pawns.remove(closestPawn)
 
-        heuristic_value = heuristic_value + player2Val
+        print("player2Val value is " + str(player2Val))
+
+        # re-stock pawns arrays
+        for i in range(len(state)):
+            for j in range(len(state[i])):
+                for k in players:
+                    if state[i][j] == k[0] and k[0] == 1:
+                        bigTuple = (i,j)
+                        player_1_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 2:
+                        bigTuple = (i,j)
+                        player_2_pawns.append(bigTuple)
+
+        alternate_heuristic = 0
+        #update for player1
+        for goal in player_1_goals:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_1_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            alternate_heuristic += lowestDistance
+            player_1_pawns.remove(closestPawn)
+
+        print("ALTERNATE heuristic value is " + str(alternate_heuristic))
+        
+        if alternate_heuristic > heuristic_value:
+            print("========== CHANGING TH E BOI =========")
+            heuristic_value = alternate_heuristic
+        else:
+            print("which is less than this other heuristic")
+
+        alternate_heuristic = 0
+        #update for player2
+        for goal in player_2_goals:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_2_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            alternate_heuristic += lowestDistance
+            player_2_pawns.remove(closestPawn)
+
+
+        print("ALTERNATE heuristic value for p2 is " + str(alternate_heuristic))
+
+        if alternate_heuristic > player2Val:
+            print("========== CHANGING TH E BOI =========")
+            player2Val = alternate_heuristic
+        else:
+            print("which is less than this other heuristic")
+
+        heuristic_value = heuristic_value - player2Val
         print("heuristic_value is " + str(heuristic_value))
 
         return heuristic_value
