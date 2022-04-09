@@ -209,6 +209,7 @@ def TreePlayers(p1, p2, p3):
         player_2_pawns = []
         player_3_pawns = []
 
+        players = [[1],[2],[3]]
         # go through the whole board and get each player's pawns
         for i in range(len(state)):
             for j in range(len(state[i])):
@@ -422,6 +423,7 @@ def TreePlayers(p1, p2, p3):
                                 animation(player_valid_moves,last_selected_token)
                         elif clicked_token in player_valid_moves:
                             move(last_selected_token, clicked_token)
+                            print("Heuristic = " + str(heuristic(matrix, clicked_token)))
                             winner()
                             is_selecting = False
                             last_selected_token = []
