@@ -196,6 +196,7 @@ def TreePlayers():
     def distance(target, destination):
         # literally just pythagorean theorem :)
         return math.sqrt((target[0] - destination[0])**2 + (target[1] - destination[1])**2)
+        # return ((target[0] - destination[0]) + (target[1] - destination[1]))
 
     def heuristic(state, players):
         heuristic_value = 0
@@ -246,6 +247,8 @@ def TreePlayers():
             player2Val -= lowestDistance
             player_2_pawns.remove(closestPawn)
 
+        
+        player2Val = (player2Val/1.6)
         print("player2Val value is " + str(player2Val))
 
         player3Val = 0
@@ -261,6 +264,7 @@ def TreePlayers():
             player3Val -= lowestDistance
             player_3_pawns.remove(closestPawn)
         
+        player3Val = (player3Val/1.6)
         print("player3Val value is " + str(player3Val))
         # re-stock pawns arrays
 
