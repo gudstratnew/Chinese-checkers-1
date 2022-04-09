@@ -1,11 +1,18 @@
+NULL = 0
+import copy
+from re import I
+from numpy import Inf
+import numpy
 import pygame
 import sys
-import numpy
 import interface2
+import math
+
+SEARCH_DEPTH = 2
 
 color_light = (202, 203, 213 )
 color_dark = (2, 6, 145)
-def SixPlayers():
+def SixPlayers(p1, p2, p3, p4, p5, p6):
     pygame.init()
     # remplir la matrice avec des 1
     matrix = numpy.ones((17, 25))
@@ -232,6 +239,45 @@ def SixPlayers():
     last_selected_token = []
     #fonction boutton pour le retour a la fenetre precedente
 
+    def alpha_beta_reg(state1, toMoveId):
+        state = copy.deepcopy(state1)
+        value = max_value(state, toMoveId, -Inf, Inf, 1)
+        return [value[1], value[2]]
+    
+    def max_value(state, player, alpha, beta, depth):
+        p = []
+        temp = player
+        temp = (temp) % 7
+        print(temp)
+        for i in range(len(state)):
+            for j in range(len(state[i])):
+                if state[i][j] == temp:
+                    p.append([i, j])
+        if (depth >= SEARCH_DEPTH):
+            return [heuristic(state, temp), NULL, NULL]
+        v = -Inf
+        move = [-1, -1]
+        initial = [-1, -1]
+        for i in p:
+            player_valid_moves = valid_moves(i)
+            print(i, player_valid_moves)
+            for a in player_valid_moves:
+                v2 = max_value(move2(state, i, a), temp + 1, alpha, beta, depth+1)
+                if (v2[0] > v):
+                    v = v2[0]
+                    move = a
+                    initial = i
+                    if (v > alpha): alpha = v
+                if (v >= beta):
+                    return [v, move, initial]
+        return [v, move, initial]
+
+    def move2(mx, pos, target):
+        matrix = copy.deepcopy(mx)
+        matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
+        matrix[pos[0]][pos[1]] = 0
+        return matrix
+    
     def text_objects(text, font):
         textsurface = font.render(text, True, "white")
         return textsurface, textsurface.get_rect()
@@ -263,49 +309,116 @@ def SixPlayers():
             WriteText('Player ' + str(player_index) + '\'s Turn', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 100,
                       50, col)
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
+        if (player_index == 1 and p1 == "ai"):
+            print(heuristic(matrix, 1))
+            temp = alpha_beta_reg(matrix, 1)
+            print(temp)
+            move(temp[1], temp[0])
+            print(heuristic(matrix, 1))
+            player_index = (player_index+1) % 7
+            if player_index == 0:
+                player_index += 1
+            screen.fill(pygame.Color("white"))
+            animation()
+        elif (player_index == 2 and p2 == "ai"):
+            print(heuristic(matrix, 2))
+            temp = alpha_beta_reg(matrix, 2)
+            print(temp)
+            move(temp[1], temp[0])
+            print(heuristic(matrix, 2))
+            player_index = (player_index+1) % 7
+            if player_index == 0:
+                player_index += 1
+            screen.fill(pygame.Color("white"))
+            animation()
+        elif (player_index == 3 and p3 == "ai"):
+            print(heuristic(matrix, 3))
+            temp = alpha_beta_reg(matrix, 3)
+            print(temp)
+            move(temp[1], temp[0])
+            print(heuristic(matrix, 3))
+            player_index = (player_index+1) % 7
+            if player_index == 0:
+                player_index += 1
+            screen.fill(pygame.Color("white"))
+            animation()
+        elif (player_index == 4 and p4 == "ai"):
+            print(heuristic(matrix, 4))
+            temp = alpha_beta_reg(matrix, 4)
+            print(temp)
+            move(temp[1], temp[0])
+            print(heuristic(matrix, 4))
+            player_index = (player_index+1) % 7
+            if player_index == 0:
+                player_index += 1
+            screen.fill(pygame.Color("white"))
+            animation()
+        elif (player_index == 5 and p5 == "ai"):
+            print(heuristic(matrix, 5))
+            temp = alpha_beta_reg(matrix, 5)
+            print(temp)
+            move(temp[1], temp[0])
+            print(heuristic(matrix, 5))
+            player_index = (player_index+1) % 7
+            if player_index == 0:
+                player_index += 1
+            screen.fill(pygame.Color("white"))
+            animation()
+        elif (player_index == 6 and p6 == "ai"):
+            print(heuristic(matrix, 6))
+            temp = alpha_beta_reg(matrix, 6)
+            print(temp)
+            move(temp[1], temp[0])
+            print(heuristic(matrix, 6))
+            player_index = (player_index+1) % 7
+            if player_index == 0:
+                player_index += 1
+            screen.fill(pygame.Color("white"))
+            animation()
+        else:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pos = pygame.mouse.get_pos()
 
-                # get a list of all sprites that are under the mouse cursor
-                clicked_sprites = [s for s in pions_rect if s.collidepoint(pos)]
+                    # get a list of all sprites that are under the mouse cursor
+                    clicked_sprites = [s for s in pions_rect if s.collidepoint(pos)]
 
-                if clicked_sprites:
-                    clicked_token = get_token_coor(clicked_sprites[0].x, clicked_sprites[0].y)
-                    if matrix[clicked_token[0], clicked_token[1]] == player_index:
-                        if clicked_token == last_selected_token:
+                    if clicked_sprites:
+                        clicked_token = get_token_coor(clicked_sprites[0].x, clicked_sprites[0].y)
+                        if matrix[clicked_token[0], clicked_token[1]] == player_index:
+                            if clicked_token == last_selected_token:
+                                is_selecting = False
+                                last_selected_token = []
+                                player_valid_moves = []
+                                screen.fill(pygame.Color("white"))
+                                animation()
+                            else:
+                                player_valid_moves = valid_moves(clicked_token)
+                                last_selected_token = clicked_token
+                                is_selecting = True
+                                screen.fill(pygame.Color("white"))
+                                animation(player_valid_moves,last_selected_token)
+                        elif clicked_token in player_valid_moves:
+                            move(last_selected_token, clicked_token)
+                            winner()
                             is_selecting = False
                             last_selected_token = []
                             player_valid_moves = []
                             screen.fill(pygame.Color("white"))
+                            player_index = (player_index+1) % 7
+                            if player_index == 0:
+                                player_index += 1
+
+
                             animation()
-                        else:
-                            player_valid_moves = valid_moves(clicked_token)
-                            last_selected_token = clicked_token
-                            is_selecting = True
-                            screen.fill(pygame.Color("white"))
-                            animation(player_valid_moves,last_selected_token)
-                    elif clicked_token in player_valid_moves:
-                        move(last_selected_token, clicked_token)
-                        winner()
-                        is_selecting = False
-                        last_selected_token = []
-                        player_valid_moves = []
-                        screen.fill(pygame.Color("white"))
-                        player_index = (player_index+1) % 7
-                        if player_index == 0:
-                            player_index += 1
 
 
-                        animation()
-
-
-            button("back", 400, 430, 70, 30, color_dark, color_light, interface2.window2)
-            rect2 = pygame.draw.rect(screen, color_dark, pygame.Rect(394, 424, 82, 42), 6, 20)
+                button("back", 400, 430, 70, 30, color_dark, color_light, interface2.window2)
+                rect2 = pygame.draw.rect(screen, color_dark, pygame.Rect(394, 424, 82, 42), 6, 20)
 
 
 

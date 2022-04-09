@@ -369,6 +369,10 @@ def TreePlayers(p1, p2, p3):
         if (winner() == False):
             WriteText('Player ' + str(player_index) + '\'s Turn', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 100,
                       50, col)
+        else:
+            screen.fill(pygame.Color("white"))
+            animation()
+            pygame.time.wait(9999999)
         if (player_index == 1 and p1 == "ai"):
             print(heuristic(matrix, 1))
             temp = alpha_beta_reg(matrix, 1)
@@ -431,7 +435,9 @@ def TreePlayers(p1, p2, p3):
                                 animation(player_valid_moves,last_selected_token)
                         elif clicked_token in player_valid_moves:
                             move(last_selected_token, clicked_token)
-                            winner()
+                            if winner() == True:
+                                animation()
+                                pygame.time.wait(9999999)
                             is_selecting = False
                             last_selected_token = []
                             player_valid_moves = []
