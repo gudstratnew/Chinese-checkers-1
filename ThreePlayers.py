@@ -289,13 +289,13 @@ def TreePlayers(p1, p2, p3):
                         player_3_pawns.append(bigTuple)
 
         if(pid == 1):
-            return -((2*heuristic_value) - abs(player2Val) - abs(player3Val))
+            return (2*heuristic_value) - abs(player2Val) - abs(player3Val)
         elif(pid == 2):
-            return -((2*abs(player2Val)) - heuristic_value - abs(player3Val))
+            return (2*abs(player2Val)) - heuristic_value - abs(player3Val)
         elif(pid == 3):
-            return -((2*abs(player3Val)) - heuristic_value - abs(player2Val))
+            return (2*abs(player3Val)) - heuristic_value - abs(player2Val)
         else:
-            return -((2*heuristic_value) - abs(player2Val) - abs(player3Val))
+            return (2*heuristic_value) - abs(player2Val) - abs(player3Val)
 
 
     def alpha_beta_reg(state1, toMoveId):
@@ -311,12 +311,11 @@ def TreePlayers(p1, p2, p3):
     def max_value(state, player, alpha, beta, depth):
         p = []
         temp = player
-        temp = (temp+1) % 3
-        if temp == 0:
-            temp += 1
+        temp = (temp) % 4
+        print(temp)
         for i in range(len(state)):
             for j in range(len(state[i])):
-                if state[i][j] == 1:
+                if state[i][j] == temp:
                     p.append([i, j])
         if (depth >= SEARCH_DEPTH):
             return [heuristic(state, temp), NULL, NULL]
@@ -327,7 +326,7 @@ def TreePlayers(p1, p2, p3):
             player_valid_moves = valid_moves(i)
             print(i, player_valid_moves)
             for a in player_valid_moves:
-                v2 = max_value(move2(state, i, a), temp, alpha, beta, depth+1)
+                v2 = max_value(move2(state, i, a), temp + 1, alpha, beta, depth+1)
                 if (v2[0] > v):
                     v = v2[0]
                     move = a
@@ -376,7 +375,7 @@ def TreePlayers(p1, p2, p3):
             print(temp)
             move(temp[1], temp[0])
             print(heuristic(matrix, 1))
-            player_index = (player_index+1) % 3
+            player_index = (player_index+1) % 4
             if player_index == 0:
                 player_index += 1
             screen.fill(pygame.Color("white"))
@@ -387,7 +386,7 @@ def TreePlayers(p1, p2, p3):
             print(temp)
             move(temp[1], temp[0])
             print(heuristic(matrix, 2))
-            player_index = (player_index+1) % 3
+            player_index = (player_index+1) % 4
             if player_index == 0:
                 player_index += 1
             screen.fill(pygame.Color("white"))
@@ -398,7 +397,7 @@ def TreePlayers(p1, p2, p3):
             print(temp)
             move(temp[1], temp[0])
             print(heuristic(matrix, 3))
-            player_index = (player_index+1) % 3
+            player_index = (player_index+1) % 4
             if player_index == 0:
                 player_index += 1
             screen.fill(pygame.Color("white"))
