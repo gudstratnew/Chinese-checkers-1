@@ -1,6 +1,7 @@
 import pygame
 import sys
 import interface2
+import math
 
 pygame.init()
 
@@ -192,6 +193,92 @@ def TreePlayers():
     player_valid_moves = []
     last_selected_token = []
 
+    def distance(target, destination):
+        # literally just pythagorean theorem :)
+        return math.sqrt((target[0] - destination[0])**2 + (target[1] - destination[1])**2)
+
+    def heuristic(state, players):
+        heuristic_value = 0
+        player_1_pawns = []
+        player_2_pawns = []
+        player_3_pawns = []
+
+        # go through the whole board and get each player's pawns
+        for i in range(len(state)):
+            for j in range(len(state[i])):
+                for k in players:
+                    if state[i][j] == k[0] and k[0] == 1:
+                        bigTuple = (i,j)
+                        player_1_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 2:
+                        bigTuple = (i,j)
+                        player_2_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 3:
+                        bigTuple = (i,j)
+                        player_3_pawns.append(bigTuple)
+        #now the pawns arrays have all known pawns
+
+        #update for player1
+        
+        for goal in first_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_1_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            heuristic_value += lowestDistance
+            player_1_pawns.remove(closestPawn)
+
+        print("heuristic value is " + str(heuristic_value))
+
+        player2Val = 0
+        #update for player2
+        for goal in second_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_2_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player2Val -= lowestDistance
+            player_2_pawns.remove(closestPawn)
+
+        print("player2Val value is " + str(player2Val))
+
+        player3Val = 0
+        #update for player2
+        for goal in third_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_3_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player3Val -= lowestDistance
+            player_3_pawns.remove(closestPawn)
+        
+        print("player3Val value is " + str(player3Val))
+        # re-stock pawns arrays
+
+        for i in range(len(state)):
+            for j in range(len(state[i])):
+                for k in players:
+                    if state[i][j] == k[0] and k[0] == 1:
+                        bigTuple = (i,j)
+                        player_1_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 2:
+                        bigTuple = (i,j)
+                        player_2_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 3:
+                        bigTuple = (i,j)
+                        player_3_pawns.append(bigTuple)
+
+        return (2*heuristic_value) - abs(player2Val) - abs(player3Val)
+
     # fonction boutton pour le retour a la fenetre precedente
     def text_objects(text, font):
         textsurface = font.render(text, True, "white")
@@ -248,6 +335,7 @@ def TreePlayers():
                             animation(player_valid_moves,last_selected_token)
                     elif clicked_token in player_valid_moves:
                         move(last_selected_token, clicked_token)
+                        print("Heuristic = " + str(heuristic(matrix, [[1, [16, 12]], [2, [4,0]], [3, [4,18]]])))
                         winner()
                         is_selecting = False
                         last_selected_token = []

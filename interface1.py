@@ -7,7 +7,7 @@ import interface2
 import help
 import os
 
-os.chdir("./Final Project/Chinese-checkers-1")
+#os.chdir("./Final Project/Chinese-checkers-1")
 
 def window1():
     color_light = (202, 203, 213 )

@@ -1,5 +1,6 @@
 import pygame
 import sys
+from ThreePlayers import ThreePlayers
 import TwoPlayers
 
 #import os
@@ -8,4 +9,4 @@ import TwoPlayers
 
 #ai: ai player
 #h: human player
-TwoPlayers.TwoPlayers("ai", "ai")
+ThreePlayers.ThreePlayers("ai", "ai")
