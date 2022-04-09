@@ -203,7 +203,7 @@ def TreePlayers(p1, p2, p3):
         return math.sqrt((target[0] - destination[0])**2 + (target[1] - destination[1])**2)
         # return ((target[0] - destination[0]) + (target[1] - destination[1]))
 
-    def heuristic(state, players):
+    def heuristic(state, pid):
         heuristic_value = 0
         player_1_pawns = []
         player_2_pawns = []
@@ -287,7 +287,13 @@ def TreePlayers(p1, p2, p3):
                         bigTuple = (i,j)
                         player_3_pawns.append(bigTuple)
 
-        return (2*heuristic_value) - abs(player2Val) - abs(player3Val)
+        if(pid == 1):
+            return (2*heuristic_value) - abs(player2Val) - abs(player3Val)
+        elif(pid == 2):
+            return (2*abs(player2Val)) - heuristic_value - abs(player3Val)
+        elif(pid == 3):
+            return (2*abs(player3Val)) - heuristic_value - abs(player2Val)
+
 
     def alpha_beta_reg(state1, toMoveId):
         state = copy.deepcopy(state1)
@@ -310,7 +316,7 @@ def TreePlayers(p1, p2, p3):
                 if state[i][j] == 1:
                     p.append([i, j])
         if (depth >= SEARCH_DEPTH):
-            return [heuristic(state, temp, [[1, [16, 12]], [2, [0, 12]]]), NULL, NULL]
+            return [heuristic(state, temp), NULL, NULL]
         v = -Inf
         move = [-1, -1]
         initial = [-1, -1]
