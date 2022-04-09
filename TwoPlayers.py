@@ -301,7 +301,7 @@ def TwoPlayers(p1, p2):
         heuristic_value = heuristic_value + player2Val
         print("heuristic_value is " + str(heuristic_value))
 
-        return heuristic_value
+        return (-heuristic_value)
 
 
     def oldHeuristic(state, players):
