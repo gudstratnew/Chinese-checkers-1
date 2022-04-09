@@ -7,7 +7,7 @@ import sys
 import interface2
 import math
 
-SEARCH_DEPTH = 3
+SEARCH_DEPTH = 2
 pygame.init()
 
 color_light = (202, 203, 213 )
@@ -236,6 +236,7 @@ def TreePlayers(p1, p2, p3):
                     closestPawn = pawn
                     lowestDistance = dist
             heuristic_value += lowestDistance
+            print(str(goal),str(closestPawn))
             player_1_pawns.remove(closestPawn)
 
         print("heuristic value is " + str(heuristic_value))
@@ -288,11 +289,13 @@ def TreePlayers(p1, p2, p3):
                         player_3_pawns.append(bigTuple)
 
         if(pid == 1):
-            return (2*heuristic_value) - abs(player2Val) - abs(player3Val)
+            return -((2*heuristic_value) - abs(player2Val) - abs(player3Val))
         elif(pid == 2):
-            return (2*abs(player2Val)) - heuristic_value - abs(player3Val)
+            return -((2*abs(player2Val)) - heuristic_value - abs(player3Val))
         elif(pid == 3):
-            return (2*abs(player3Val)) - heuristic_value - abs(player2Val)
+            return -((2*abs(player3Val)) - heuristic_value - abs(player2Val))
+        else:
+            return -((2*heuristic_value) - abs(player2Val) - abs(player3Val))
 
 
     def alpha_beta_reg(state1, toMoveId):
@@ -429,7 +432,6 @@ def TreePlayers(p1, p2, p3):
                                 animation(player_valid_moves,last_selected_token)
                         elif clicked_token in player_valid_moves:
                             move(last_selected_token, clicked_token)
-                            print("Heuristic = " + str(heuristic(matrix, clicked_token)))
                             winner()
                             is_selecting = False
                             last_selected_token = []
