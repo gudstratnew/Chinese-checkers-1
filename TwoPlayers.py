@@ -458,7 +458,7 @@ def TwoPlayers(p1, p2):
 
                         if clicked_sprites:
                             clicked_token = get_token_coor(clicked_sprites[0].x, clicked_sprites[0].y)
-                            if matrix[clicked_token[0], clicked_token[1]] == player_index and last_jumped == [-1, -1] or clicked_token == last_jumped:
+                            if matrix[clicked_token[0], clicked_token[1]] == player_index:
                                 if clicked_token == last_selected_token:
                                     is_selecting = False
                                     last_selected_token = []
@@ -475,13 +475,9 @@ def TwoPlayers(p1, p2):
                                 move(last_selected_token, clicked_token)
                                 print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
                                 winner()
-                                if (abs(clicked_token[0]-last_selected_token[0]) + abs(clicked_token[1]-last_selected_token[1]) < 4):
-                                    last_jumped = [-1, -1]
-                                    player_index = (player_index+1) % 3
-                                    if player_index == 0:
-                                        player_index += 1
-                                else:
-                                    last_jumped = clicked_token
+                                player_index = (player_index+1) % 3
+                                if player_index == 0:
+                                    player_index += 1
                                 is_selecting = False
                                 last_selected_token = []
                                 player_valid_moves = []
