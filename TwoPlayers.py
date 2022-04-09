@@ -211,6 +211,7 @@ def TwoPlayers(p1, p2):
         print(str(player_2_pawns))
 
         #update for player1
+        
         for goal in player_1_goals:
             closestPawn = (0,0)
             lowestDistance = 100000 #lazy way to represent positive infinity
@@ -252,7 +253,8 @@ def TwoPlayers(p1, p2):
 
         alternate_heuristic = 0
         #update for player1
-        for goal in player_1_goals:
+        player_1_goals_inverse = [(16,12), (15,13), (15,11), (14,14), (14,12), (14,10), (13,15), (13,13), (13,11), (13,9)]
+        for goal in player_1_goals_inverse:
             closestPawn = (0,0)
             lowestDistance = 100000 #lazy way to represent positive infinity
             for pawn in player_1_pawns:
@@ -266,14 +268,15 @@ def TwoPlayers(p1, p2):
         print("ALTERNATE heuristic value is " + str(alternate_heuristic))
         
         if alternate_heuristic > heuristic_value:
-            print("========== CHANGING TH E BOI =========")
+            print("========== CHANGING TH E BOI 1=========")
             heuristic_value = alternate_heuristic
         else:
             print("which is less than this other heuristic")
 
         alternate_heuristic = 0
         #update for player2
-        for goal in player_2_goals:
+        player_2_goals_inverse = [(0,12), (1,13), (1,11), (2,14), (2,12), (2,10), (3,15), (3,13), (3,11), (3,9)] 
+        for goal in player_2_goals_inverse:
             closestPawn = (0,0)
             lowestDistance = 100000 #lazy way to represent positive infinity
             for pawn in player_2_pawns:
@@ -287,13 +290,15 @@ def TwoPlayers(p1, p2):
 
         print("ALTERNATE heuristic value for p2 is " + str(alternate_heuristic))
 
-        if alternate_heuristic > player2Val:
-            print("========== CHANGING TH E BOI =========")
-            player2Val = alternate_heuristic
+        if alternate_heuristic > abs(player2Val):
+            print("========== CHANGING TH E BOI 2=========")
+            player2Val = 0 - alternate_heuristic
         else:
+            print(str(alternate_heuristic))
+            print(str(player2Val))
             print("which is less than this other heuristic")
 
-        heuristic_value = heuristic_value - player2Val
+        heuristic_value = heuristic_value + player2Val
         print("heuristic_value is " + str(heuristic_value))
 
         return heuristic_value
@@ -372,7 +377,7 @@ def TwoPlayers(p1, p2):
                     if (v < beta): beta = v
                 if (v <= alpha): 
                     return [v, move, initial]
-            return [v, move, initial]
+        return [v, move, initial]
 
     def move2(mx, pos, target):
         matrix = copy.deepcopy(mx)
