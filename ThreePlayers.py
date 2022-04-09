@@ -368,33 +368,33 @@ def TreePlayers(p1, p2, p3):
             WriteText('Player ' + str(player_index) + '\'s Turn', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 100,
                       50, col)
         if (player_index == 1 and p1 == "ai"):
-            print(heuristic(matrix, [[1, [16, 12]], [2, [4, 0]], [3, [4, 24]]]))
+            print(heuristic(matrix, 1))
             temp = alpha_beta_reg(matrix, 1)
             print(temp)
             move(temp[1], temp[0])
-            print(heuristic(matrix, [[1, [16, 12]], [2, [4, 0]], [3, [4, 24]]]))
+            print(heuristic(matrix, 1))
             player_index = (player_index+1) % 3
             if player_index == 0:
                 player_index += 1
             screen.fill(pygame.Color("white"))
             animation()
         elif (player_index == 2 and p2 == "ai"):
-            print(heuristic(matrix, [[1, [16, 12]], [2, [4, 0]], [3, [4, 24]]]))
+            print(heuristic(matrix, 2))
             temp = alpha_beta_reg(matrix, 2)
             print(temp)
             move(temp[1], temp[0])
-            print(heuristic(matrix, [[1, [16, 12]], [2, [4, 0]], [3, [4, 24]]]))
+            print(heuristic(matrix, 2))
             player_index = (player_index+1) % 3
             if player_index == 0:
                 player_index += 1
             screen.fill(pygame.Color("white"))
             animation()
         elif (player_index == 3 and p3 == "ai"):
-            print(heuristic(matrix, [[1, [16, 12]], [2, [4, 0]], [3, [4, 24]]]))
-            temp = alpha_beta_reg(matrix, 2)
+            print(heuristic(matrix, 3))
+            temp = alpha_beta_reg(matrix, 3)
             print(temp)
             move(temp[1], temp[0])
-            print(heuristic(matrix, [[1, [16, 12]], [2, [4, 0]], [3, [4, 24]]]))
+            print(heuristic(matrix, 3))
             player_index = (player_index+1) % 3
             if player_index == 0:
                 player_index += 1
