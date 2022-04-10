@@ -10,7 +10,7 @@ import math
 SEARCH_DEPTH = 2
 pygame.init()
 
-color_light = (202, 203, 213 )
+color_light = (202, 203, 213)
 color_dark = (2, 6, 145)
 import numpy
 def TreePlayers(p1, p2, p3):

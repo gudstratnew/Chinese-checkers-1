@@ -251,7 +251,7 @@ def FoorPlayers(p1, p2, p3, p4):
 
     def distance(target, destination):
         # literally just pythagorean theorem :)
-        return math.sqrt((target[0] - destination[0])**2 + (target[1] - destination[1])**2)
+        return math.sqrt((target[0] - destination[0])**2 + (target[1]/math.sqrt(2) - destination[1]/math.sqrt(2))**2)
         # return ((target[0] - destination[0]) + (target[1] - destination[1]))
 
     def heuristic(state, pid):
@@ -265,19 +265,18 @@ def FoorPlayers(p1, p2, p3, p4):
         # go through the whole board and get each player's pawns
         for i in range(len(state)):
             for j in range(len(state[i])):
-                for k in players:
-                    if state[i][j] == 1:
-                        bigTuple = (i,j)
-                        player_1_pawns.append(bigTuple)
-                    elif state[i][j] == 2:
-                        bigTuple = (i,j)
-                        player_2_pawns.append(bigTuple)
-                    elif state[i][j] == 3:
-                        bigTuple = (i,j)
-                        player_3_pawns.append(bigTuple)
-                    elif state[i][j] == 4:
-                        bigTuple = (i,j)
-                        player_4_pawns.append(bigTuple)
+                if state[i][j] == 1:
+                    bigTuple = (i,j)
+                    player_1_pawns.append(bigTuple)
+                elif state[i][j] == 2:
+                    bigTuple = (i,j)
+                    player_2_pawns.append(bigTuple)
+                elif state[i][j] == 3:
+                    bigTuple = (i,j)
+                    player_3_pawns.append(bigTuple)
+                elif state[i][j] == 4:
+                    bigTuple = (i,j)
+                    player_4_pawns.append(bigTuple)
         #now the pawns arrays have all known pawns
 
         #update for player1
@@ -293,7 +292,7 @@ def FoorPlayers(p1, p2, p3, p4):
             heuristic_value += lowestDistance
             #print(str(goal),str(closestPawn))
             player_1_pawns.remove(closestPawn)
-        heuristic_value = heuristic_value/1.6
+        #heuristic_value = heuristic_value/1.6
         #print("heuristic value is " + str(heuristic_value))
 
         player2Val = 0
@@ -306,10 +305,10 @@ def FoorPlayers(p1, p2, p3, p4):
                 if dist < lowestDistance:
                     closestPawn = pawn
                     lowestDistance = dist
-            player2Val -= lowestDistance
+            player2Val += lowestDistance
             player_2_pawns.remove(closestPawn)
 
-        player2Val = player2Val/1.6
+        #player2Val = player2Val/1.6
         #print("player2Val value is " + str(player2Val))
 
         player3Val = 0
@@ -322,11 +321,11 @@ def FoorPlayers(p1, p2, p3, p4):
                 if dist < lowestDistance:
                     closestPawn = pawn
                     lowestDistance = dist
-            player3Val -= lowestDistance
+            player3Val += lowestDistance
             player_3_pawns.remove(closestPawn)
         
         #print("player3Val value is " + str(player3Val))
-        player3Val = player3Val/1.6
+        #player3Val = player3Val/1.6
 
         player4Val = 0
 
@@ -338,10 +337,10 @@ def FoorPlayers(p1, p2, p3, p4):
                 if dist < lowestDistance:
                     closestPawn = pawn
                     lowestDistance = dist
-            player4Val -= lowestDistance
+            player4Val += lowestDistance
             player_4_pawns.remove(closestPawn)
 
-        player4Val = player4Val/1.6
+        #player4Val = player4Val/1.6
 
          # re-stock pawns arrays
         for i in range(len(state)):
@@ -377,7 +376,7 @@ def FoorPlayers(p1, p2, p3, p4):
             player1Val_a += lowestDistance
             player_1_pawns.remove(closestPawn)
 
-        player1Val_a = player1Val_a/1.6
+        #player1Val_a = player1Val_a/1.6
 
         if(player1Val_a > heuristic_value):
            heuristic_value = player1Val_a
@@ -394,7 +393,7 @@ def FoorPlayers(p1, p2, p3, p4):
             player2Val_a += lowestDistance
             player_2_pawns.remove(closestPawn)
 
-        player2Val_a = player2Val_a/1.6
+        #player2Val_a = player2Val_a/1.6
 
         if(abs(player2Val_a) > abs(player2Val)):
             player2Val = player2Val_a
@@ -411,7 +410,7 @@ def FoorPlayers(p1, p2, p3, p4):
             player3Val_a += lowestDistance
             player_3_pawns.remove(closestPawn)
 
-        player3Val_a = player3Val_a/1.6
+        #player3Val_a = player3Val_a/1.6
 
         if(abs(player3Val_a) > abs(player3Val)):
             player3Val = player3Val_a
@@ -428,19 +427,19 @@ def FoorPlayers(p1, p2, p3, p4):
             player4Val_a += lowestDistance
             player_4_pawns.remove(closestPawn)
 
-        player4Val_a = player4Val_a/1.6
+        #player4Val_a = player4Val_a/1.6
 
         if(abs(player4Val_a) > abs(player4Val)):
             player4Val = player4Val_a
 
         if(pid == 1):
-            return (3*heuristic_value) - abs(player2Val) - abs(player3Val) - abs(player4Val)
+            return (3*abs(heuristic_value)) - abs(player2Val) - abs(player3Val) - abs(player4Val)
         elif(pid == 2):
-            return (3*abs(player2Val)) - heuristic_value - abs(player3Val) - abs(player4Val)
+            return (3*abs(player2Val)) - abs(heuristic_value) - abs(player3Val) - abs(player4Val)
         elif(pid == 3):
-            return (3*abs(player3Val)) - heuristic_value - abs(player2Val) - abs(player4Val)
+            return (3*abs(player3Val)) - abs(heuristic_value) - abs(player2Val) - abs(player4Val)
         elif(pid == 4):
-            return (3*abs(player4Val)) - heuristic_value - abs(player2Val) - abs(player3Val)
+            return (3*abs(player4Val)) - abs(heuristic_value) - abs(player2Val) - abs(player3Val)
 
 
 
