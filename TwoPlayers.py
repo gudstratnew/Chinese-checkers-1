@@ -9,7 +9,9 @@ import math
 import time
 import pickle
 
-SEARCH_DEPTH = 3
+SEARCH_DEPTH = 2
+OPENING_DEPTH = 9
+MOVE_COUNT = 0
 
 class MoveNode:
     def __init__(self, piece, target):
@@ -36,10 +38,7 @@ class MoveNode:
         self.winrate = self.winrate + ((1 - self.winrate) / self.occurrences)
 
     def updateLose(self):
-        print("losing!")
-        print("occurences " + str(self.occurrences))
         self.occurrences += 1
-        print("-->" + str(self.occurrences))
         self.winrate = self.winrate + ((0 - self.winrate) / self.occurrences)
 
     def addChild(self, newNode):
@@ -90,8 +89,12 @@ def findOpeningCandidate():
     for candidate in currentMove.children:
         print("looking at candidate: " + str(candidate))
         if candidate.occurrences == 0:
+            print("returning" + str(candidate) + " because it has no occurrences..." )
             return candidate # we need *some* data on this opening!
-        valuation = (candidate.winrate + (math.sqrt(2) * (math.log(currentMove.occurrences)/candidate.occurrences)))
+        # exploration vs exploitation. 
+        # c = math.sqrt(2) # this is the recommended value but while I'm exploring I will use the following
+        c = 2
+        valuation = (candidate.winrate + (c * (math.log(currentMove.occurrences)/candidate.occurrences)))
         print("valuation is: " + str(valuation))
         if valuation > bestValuation:
             bestCandidate = candidate
@@ -215,6 +218,8 @@ def TwoPlayers(p1, p2):
 
     # pour faire le mouvement
     def move(pos, target):
+        global MOVE_COUNT
+        MOVE_COUNT += 1
         matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
         matrix[pos[0]][pos[1]] = 0
 
@@ -267,12 +272,14 @@ def TwoPlayers(p1, p2):
             WriteText('Player 2 had won!', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 130, 50, 'green')
             updateWinrateTree(2)
             saveOpeningTree()
+            print("FINAL MOVE COUNT: " + str(MOVE_COUNT))
             return True
 
         elif first == True :
             WriteText('Player 1 had won!', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 130, 50,'red')
             updateWinrateTree(1)
             saveOpeningTree()
+            print("FINAL MOVE COUNT: " + str(MOVE_COUNT))
             return True
         else:
             return False
@@ -404,7 +411,33 @@ def TwoPlayers(p1, p2):
     def alpha_beta_reg(state1, toMoveId):
         global currentMove #look I'm just gonna use this globally I don't wanna write getters and setters
 
-        if(len(played_moves) < 4):
+
+        playerMoves = []
+        for i in range(len(state1)):
+            for j in range(len(state1[i])):
+                if state1[i][j] == toMoveId:
+                    playerMoves.append([i, j])
+        v = -Inf
+        move = [-1, -1]
+        initial = [-1, -1]
+        for i in playerMoves:
+            player_valid_moves = valid_moves(i)
+            for a in player_valid_moves:
+                #add this move to the move list
+                if (len(played_moves) < OPENING_DEPTH):
+                    newMoveNode = MoveNode(i, a)
+                    candidateFound = False
+                    for child in currentMove.children:
+                        if newMoveNode.equals(child):
+                            candidateFound = True
+                    if not candidateFound:
+                        currentMove.addChild(newMoveNode)
+                        print("ADDING A NEW NODE")
+
+
+
+
+        if(len(played_moves) < OPENING_DEPTH):
             bestCandidate = findOpeningCandidate()
 
             if bestCandidate != False:
@@ -432,6 +465,18 @@ def TwoPlayers(p1, p2):
         for i in p1:
             player_valid_moves = valid_moves(i)
             for a in player_valid_moves:
+                #add this move to the move list
+                if (len(played_moves) < OPENING_DEPTH):
+                    newMoveNode = MoveNode(i, a)
+                    candidateFound = False
+                    for child in currentMove.children:
+                        if newMoveNode.equals(child):
+                            candidateFound = True
+                    if not candidateFound:
+                        currentMove.addChild(newMoveNode)
+                        print("ADDING A NEW NODE")
+
+
                 v2 = min_value(move2(state, i, a), alpha, beta, depth+1)
                 if (v2[0] > v):
                     v = v2[0]
@@ -501,19 +546,38 @@ def TwoPlayers(p1, p2):
         if player_index == 1: col = 'red'
         if (winner() == False):
             WriteText('Player ' + str(player_index) + '\'s Turn', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 100, 50, col)
+
+            if (MOVE_COUNT > 180): # the game probably stalled out
+                print("-------- game stalled out -------------")
+                heur = heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]])
+                print("heuristic is " + str(heur))
+                if heur  > 0:
+                    WriteText('Player 1 had won!', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 130, 50, 'green')
+                    updateWinrateTree(1)
+                    saveOpeningTree()
+                    print("FINAL MOVE COUNT: " + str(MOVE_COUNT))
+                    return True
+                else:
+                    WriteText('Player 2 had won!', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 130, 50, 'green')
+                    updateWinrateTree(2)
+                    saveOpeningTree()
+                    print("FINAL MOVE COUNT: " + str(MOVE_COUNT))
+                    return True
+
         else:
-            time.sleep(5)
+            #time.sleep(5) TODO: Add this back :)
             return()
         
         if (player_index == 1 and p1 == "ai"):
+            print("<< Player 1")
             print("current heuristic is")
             print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             temp = alpha_beta_reg(matrix, 1)
             print("chose the move: ")
-            print(temp)
+            #print(temp)
 
             # add the move to played moves
-            if len(played_moves) < 4:
+            if len(played_moves) < OPENING_DEPTH:
                 playedMoveNode = MoveNode(temp[1], temp[0])
                 played_moves.append(playedMoveNode)
 
@@ -535,12 +599,15 @@ def TwoPlayers(p1, p2):
             screen.fill(pygame.Color("white"))
             animation()
         elif (player_index == 2 and p2 == "ai"):
-            #print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+            print(">> Player 2")
+            print("current heuristic is")
+            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             temp = alpha_beta_reg(matrix, 2)
+            print("chose the move: ")
             print(temp)
 
             # add the move to played moves
-            if len(played_moves) < 4:
+            if len(played_moves) < OPENING_DEPTH:
                 playedMoveNode = MoveNode(temp[1], temp[0])
                 played_moves.append(playedMoveNode)
 
@@ -604,7 +671,7 @@ def TwoPlayers(p1, p2):
 
 
                                 # update played moves array
-                                if len(played_moves) < 4:
+                                if len(played_moves) < OPENING_DEPTH:
                                     playedMoveNode = MoveNode(last_selected_token, clicked_token)
                                     played_moves.append(playedMoveNode)
                                     newMove = False
