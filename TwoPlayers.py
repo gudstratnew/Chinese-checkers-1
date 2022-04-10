@@ -198,13 +198,12 @@ def TwoPlayers(p1, p2):
         # go through the whole board and get each player's pawns
         for i in range(len(state)):
             for j in range(len(state[i])):
-                for k in players:
-                    if state[i][j] == k[0] and k[0] == 1:
-                        bigTuple = (i,j)
-                        player_1_pawns.append(bigTuple)
-                    elif state[i][j] == k[0] and k[0] == 2:
-                        bigTuple = (i,j)
-                        player_2_pawns.append(bigTuple)
+                if state[i][j] == 1:
+                    bigTuple = (i,j)
+                    player_1_pawns.append(bigTuple)
+                elif state[i][j] == 2:
+                    bigTuple = (i,j)
+                    player_2_pawns.append(bigTuple)
         #now the pawns arrays have all known pawns
         print("==== boii ====")
         print(str(player_1_pawns))
@@ -243,13 +242,12 @@ def TwoPlayers(p1, p2):
         # re-stock pawns arrays
         for i in range(len(state)):
             for j in range(len(state[i])):
-                for k in players:
-                    if state[i][j] == k[0] and k[0] == 1:
-                        bigTuple = (i,j)
-                        player_1_pawns.append(bigTuple)
-                    elif state[i][j] == k[0] and k[0] == 2:
-                        bigTuple = (i,j)
-                        player_2_pawns.append(bigTuple)
+                if state[i][j] == 1:
+                    bigTuple = (i,j)
+                    player_1_pawns.append(bigTuple)
+                elif state[i][j] == 2:
+                    bigTuple = (i,j)
+                    player_2_pawns.append(bigTuple)
 
         alternate_heuristic = 0
         #update for player1

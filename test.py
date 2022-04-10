@@ -11,7 +11,7 @@ import os
 
 #ai: ai player
 #h: human player
-#TwoPlayers.TwoPlayers("ai", "h")
+#TwoPlayers.TwoPlayers("ai", "ai")
 
 #ThreePlayers.TreePlayers("ai", "ai", "ai")
 

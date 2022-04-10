@@ -23,9 +23,9 @@ def TreePlayers(p1, p2, p3):
     first_player = [[0, 12], [1, 11], [1, 13], [2, 10], [2, 12], [2, 14], [3, 9], [3, 11], [3, 13], [3, 15]]
     first_aim = [[16, 12], [15, 11], [15, 13], [14, 10], [14, 12], [14, 14], [13, 9], [13, 11], [13, 13],[13, 15]]
     second_player = [[12, 18], [12, 20], [12, 22], [12, 24], [11, 19], [11, 21], [11, 23], [10, 20], [10, 22], [9, 21]]
-    second_aim = [[4, 0], [4, 2], [4, 4], [4, 6], [5, 1], [5, 3], [5, 5], [6, 2], [6, 4], [7, 3]]
+    second_aim = [[4, 0], [4, 2], [5, 1], [4, 4], [5, 3], [6, 2], [4, 6], [5, 5], [6, 4], [7, 3]]
     third_player = [[12, 0], [12, 2], [12, 4], [12, 6], [11, 1], [11, 3], [11, 5], [10, 2], [10, 4], [9, 3]]
-    third_aim = [[4, 18], [4, 20], [4, 22], [4, 24], [5, 19], [5, 21], [5, 23], [6, 20], [6, 22], [7, 21]]
+    third_aim = [[4, 24], [5, 23], [4, 22], [6, 22], [5, 21], [4, 20], [7, 21], [6, 20], [5, 19], [4, 18]]
     # des indexs pour le deplacement
     move_index = [[-1, -1], [-1, 1], [0, 2], [1, 1], [1, -1], [0, -2]]
 
@@ -213,16 +213,15 @@ def TreePlayers(p1, p2, p3):
         # go through the whole board and get each player's pawns
         for i in range(len(state)):
             for j in range(len(state[i])):
-                for k in players:
-                    if state[i][j] == k[0] and k[0] == 1:
-                        bigTuple = (i,j)
-                        player_1_pawns.append(bigTuple)
-                    elif state[i][j] == k[0] and k[0] == 2:
-                        bigTuple = (i,j)
-                        player_2_pawns.append(bigTuple)
-                    elif state[i][j] == k[0] and k[0] == 3:
-                        bigTuple = (i,j)
-                        player_3_pawns.append(bigTuple)
+                if state[i][j] == 1:
+                    bigTuple = (i,j)
+                    player_1_pawns.append(bigTuple)
+                elif state[i][j] == 2:
+                    bigTuple = (i,j)
+                    player_2_pawns.append(bigTuple)
+                elif state[i][j] == 3:
+                    bigTuple = (i,j)
+                    player_3_pawns.append(bigTuple)
         #now the pawns arrays have all known pawns
 
         #update for player1
@@ -251,7 +250,7 @@ def TreePlayers(p1, p2, p3):
                 if dist < lowestDistance:
                     closestPawn = pawn
                     lowestDistance = dist
-            player2Val -= lowestDistance
+            player2Val += lowestDistance
             player_2_pawns.remove(closestPawn)
 
         
@@ -268,7 +267,7 @@ def TreePlayers(p1, p2, p3):
                 if dist < lowestDistance:
                     closestPawn = pawn
                     lowestDistance = dist
-            player3Val -= lowestDistance
+            player3Val += lowestDistance
             player_3_pawns.remove(closestPawn)
         
         player3Val = (player3Val/1.6)
@@ -277,20 +276,19 @@ def TreePlayers(p1, p2, p3):
 
         for i in range(len(state)):
             for j in range(len(state[i])):
-                for k in players:
-                    if state[i][j] == k[0] and k[0] == 1:
-                        bigTuple = (i,j)
-                        player_1_pawns.append(bigTuple)
-                    elif state[i][j] == k[0] and k[0] == 2:
-                        bigTuple = (i,j)
-                        player_2_pawns.append(bigTuple)
-                    elif state[i][j] == k[0] and k[0] == 3:
-                        bigTuple = (i,j)
-                        player_3_pawns.append(bigTuple)
+                if state[i][j] == 1:
+                    bigTuple = (i,j)
+                    player_1_pawns.append(bigTuple)
+                elif state[i][j] == 2:
+                    bigTuple = (i,j)
+                    player_2_pawns.append(bigTuple)
+                elif state[i][j] == 3:
+                    bigTuple = (i,j)
+                    player_3_pawns.append(bigTuple)
 
         player1_inverse = [[16, 12], [15, 13], [15, 11], [14, 14], [14, 12], [14, 10], [13, 15], [13, 13], [13, 11],[13, 9]]
-        player2_inverse = [[4, 6], [4, 4], [4, 2], [4, 0], [5, 5], [5, 3], [5, 1], [6, 4], [6, 2], [7, 3]]
-        player3_inverse = [[4, 24], [4, 22], [4, 20], [4, 18], [5, 23], [5, 21], [5, 19], [6, 22], [6, 20], [7, 21]]
+        player2_inverse = [[4, 0], [5, 1], [4, 2], [6, 2], [5, 3], [4, 4], [7, 3], [6, 4], [5, 5], [4, 6]]
+        player3_inverse = [[4, 24], [4, 22], [5, 23], [4, 20], [5, 21], [6, 22], [4, 18], [5, 19], [6, 20], [7, 21]]
 
         
         player1Val_a = 0
@@ -345,11 +343,11 @@ def TreePlayers(p1, p2, p3):
         
 
         if(pid == 1):
-            return (3*heuristic_value) - abs(player2Val) - abs(player3Val)
+            return (2*heuristic_value) - player2Val - player3Val
         elif(pid == 2):
-            return (3*abs(player2Val)) - heuristic_value - abs(player3Val)
+            return (2*player2Val) - heuristic_value - player3Val
         elif(pid == 3):
-            return (3*abs(player3Val)) - heuristic_value - abs(player2Val)
+            return (2*player3Val) - heuristic_value - player2Val
 
 
     def alpha_beta_reg(state1, toMoveId):

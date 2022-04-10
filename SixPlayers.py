@@ -136,9 +136,6 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
 
 
     def animation(moves=[], clicked_token=None):
-
-
-
             colors = [(240, 230, 230), "red", "yellow", "orange", "green", "pink", "blue"]
             moves.append(clicked_token)
             for i in range(0, 17):
@@ -269,25 +266,24 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
         # go through the whole board and get each player's pawns
         for i in range(len(state)):
             for j in range(len(state[i])):
-                for k in players:
-                    if state[i][j] == 1:
-                        bigTuple = (i,j)
-                        player_1_pawns.append(bigTuple)
-                    elif state[i][j] == 2:
-                        bigTuple = (i,j)
-                        player_2_pawns.append(bigTuple)
-                    elif state[i][j] == 3:
-                        bigTuple = (i,j)
-                        player_3_pawns.append(bigTuple)
-                    elif state[i][j] == 4:
-                        bigTuple = (i,j)
-                        player_4_pawns.append(bigTuple)
-                    elif state[i][j] == 5:
-                        bigTuple = (i,j)
-                        player_5_pawns.append(bigTuple)
-                    elif state[i][j] == 6:
-                        bigTuple = (i,j)
-                        player_6_pawns.append(bigTuple)
+                if state[i][j] == 1:
+                    bigTuple = (i,j)
+                    player_1_pawns.append(bigTuple)
+                elif state[i][j] == 2:
+                    bigTuple = (i,j)
+                    player_2_pawns.append(bigTuple)
+                elif state[i][j] == 3:
+                    bigTuple = (i,j)
+                    player_3_pawns.append(bigTuple)
+                elif state[i][j] == 4:
+                    bigTuple = (i,j)
+                    player_4_pawns.append(bigTuple)
+                elif state[i][j] == 5:
+                    bigTuple = (i,j)
+                    player_5_pawns.append(bigTuple)
+                elif state[i][j] == 6:
+                    bigTuple = (i,j)
+                    player_6_pawns.append(bigTuple)
         #now the pawns arrays have all known pawns
 
         #update for player1
@@ -367,7 +363,7 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
         player5Val = (player5Val/1.6)
 
         player6Val = 0
-        for goal in fifth_aim:
+        for goal in sixth_aim:
             closestPawn = (0,0)
             lowestDistance = 100000 #lazy way to represent positive infinity
             for pawn in player_6_pawns:
@@ -380,6 +376,128 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
 
         player6Val = (player6Val/1.6)
         
+        # re-stock pawns arrays
+        for i in range(len(state)):
+            for j in range(len(state[i])):
+                for k in players:
+                    if state[i][j] == k[0] and k[0] == 1:
+                        bigTuple = (i,j)
+                        player_1_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 2:
+                        bigTuple = (i,j)
+                        player_2_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 3:
+                        bigTuple = (i,j)
+                        player_3_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 4:
+                        bigTuple = (i,j)
+                        player_4_pawns.append(bigTuple)  
+
+        player1_inverse = [[16, 12], [15, 13], [15, 11], [14, 14], [14, 12], [14, 10], [13, 15], [13, 13], [13, 11], [13, 9]]
+        player2_inverse = [[12, 6], [12, 4], [12, 2], [12, 0], [11, 5], [11, 3], [11, 1], [10, 4], [10, 2], [9, 3]]
+        player3_inverse = [[4, 6], [4, 4], [4, 2], [4, 0], [5, 5], [5, 3], [5, 1], [6, 4], [6, 2], [7, 3]]
+        player4_inverse = [[0, 12], [1, 13], [1, 11], [2, 14], [2, 12], [2, 10], [3, 15], [3, 13], [3, 11], [3, 9]]
+        player5_inverse = [[4, 24], [4, 22], [4, 20], [4, 18], [5, 23], [5, 21], [5, 19], [6, 22], [6, 20], [7, 21]]
+        player6_inverse = [[12, 24], [12, 22], [12, 20], [12, 18], [11, 23], [11, 21], [11, 19], [10, 22], [10, 20], [9, 21]]
+
+        player1Val_a = 0
+        for goal in player1_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_1_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player1Val_a += lowestDistance
+            player_1_pawns.remove(closestPawn)
+
+        if(player1Val_a > heuristic_value):
+           heuristic_value = player1Val_a
+
+        player2Val_a = 0
+        for goal in player2_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_2_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player2Val_a += lowestDistance
+            player_2_pawns.remove(closestPawn)
+
+        player2Val_a = player2Val_a/1.6
+
+        if(abs(player2Val_a) > abs(player2Val)):
+            player2Val = player2Val_a
+
+        player3Val_a = 0
+        for goal in player3_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_3_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player3Val_a += lowestDistance
+            player_3_pawns.remove(closestPawn)
+
+        player3Val_a = player3Val_a/1.6
+
+        if(abs(player3Val_a) > abs(player3Val)):
+            player3Val = player3Val_a
+
+        player4Val_a = 0
+        for goal in player4_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_4_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player4Val_a += lowestDistance
+            player_4_pawns.remove(closestPawn)
+
+        if(abs(player4Val_a) > abs(player4Val)):
+            player4Val = player4Val_a
+
+        player5Val_a = 0
+        for goal in player5_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_5_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player5Val_a += lowestDistance
+            player_5_pawns.remove(closestPawn)
+
+        player5Val_a = player5Val_a/1.6
+
+        if(abs(player5Val_a) > abs(player5Val)):
+            player5Val = player5Val_a
+
+        player6Val_a = 0
+        for goal in player6_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_6_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player6Val_a += lowestDistance
+            player_6_pawns.remove(closestPawn)
+
+        player6Val_a = player6Val_a/1.6
+
+        if(abs(player6Val_a) > abs(player6Val)):
+            player6Val = player6Val_a
+
         if(pid == 1):
             return (5*heuristic_value) - abs(player2Val) - abs(player3Val) - abs(player4Val) - abs(player5Val) - abs(player6Val)
         elif(pid == 2):
