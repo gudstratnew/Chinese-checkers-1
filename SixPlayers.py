@@ -120,6 +120,10 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
                             if -1 < x3 < 17 and -1 < y3 < 25:
                                 if matrix[x3][y3] > 0:
                                     check_path(move_index[j], x3, y3, moves_array)
+    
+    def move(pos, target):
+        matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
+        matrix[pos[0]][pos[1]] = 0
 
     #pour faire le mouvement
     def move2(mx, pos, target):
