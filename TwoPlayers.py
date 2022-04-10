@@ -36,7 +36,10 @@ class MoveNode:
         self.winrate = self.winrate + ((1 - self.winrate) / self.occurrences)
 
     def updateLose(self):
+        print("losing!")
+        print("occurences " + str(self.occurrences))
         self.occurrences += 1
+        print("-->" + str(self.occurrences))
         self.winrate = self.winrate + ((0 - self.winrate) / self.occurrences)
 
     def addChild(self, newNode):
@@ -57,6 +60,13 @@ opening_winrates = pickle.load(winrate_file)
 winrate_file.close()
 
 def saveOpeningTree():
+    print("saving opening Tree")
+
+    # just print the tree as we're saving it for information's sake
+    print("here are the moves in the tree :")
+    for openingMove in opening_winrates.children:
+        print(str(openingMove) + " wr = " + str(openingMove.getWinRate()) + " K = " + str(openingMove.getOccurrences()))
+
     winrate_file = open('opening_tree.txt', 'wb')
     pickle.dump(opening_winrates, winrate_file) # this will just save the opening winrates object generated at startup :)
     winrate_file.close()
@@ -75,7 +85,6 @@ print(currentMove is opening_winrates)
 
 def findOpeningCandidate():
     print("finding a candidate for current move = " + str(currentMove))
-    currentMove.occurrences = 2
     bestCandidate = False
     bestValuation = False
     for candidate in currentMove.children:
@@ -98,16 +107,18 @@ def updateWinrateTree(i):
     for pMove in played_moves:
         for stat in tracer.children:
             if pMove.equals(stat):
-                stat.occurrences += 1
                 if (index % 2):
                     stat.updateLose()
                     print("adding a Loss to " + str(stat))
+                    print("now it has wr = " + str(stat.winrate) + " and k = "+ str(stat.occurrences))
                 else:
                     stat.updateWin()
                     print("adding a win to " + str(stat))
+                    print("now it has wr = " + str(stat.winrate) + " and k = "+ str(stat.occurrences))
                 index += 1
                 tracer = stat
                 break
+    saveOpeningTree()
 
 
 
@@ -393,12 +404,12 @@ def TwoPlayers(p1, p2):
     def alpha_beta_reg(state1, toMoveId):
         global currentMove #look I'm just gonna use this globally I don't wanna write getters and setters
 
-        bestCandidate = findOpeningCandidate()
+        if(len(played_moves) < 4):
+            bestCandidate = findOpeningCandidate()
 
-        if bestCandidate != False:
-            # UNCOMMENT THIS TO MAKE IT NOT BREAK???
-            # currentMove = bestCandidate
-            return[bestCandidate.target, bestCandidate.piece]
+            if bestCandidate != False:
+                return[bestCandidate.target, bestCandidate.piece]
+
 
         state = copy.deepcopy(state1)
         if (toMoveId == 1):

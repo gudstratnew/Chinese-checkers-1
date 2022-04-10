@@ -12,7 +12,8 @@ import SixPlayers
 #ai: ai player
 #h: human player
 
-TwoPlayers.TwoPlayers("ai", "ai")
+for boi in range(270):
+    TwoPlayers.TwoPlayers("ai", "ai")
 
 #ThreePlayers.TreePlayers("ai", "ai", "ai")
 
