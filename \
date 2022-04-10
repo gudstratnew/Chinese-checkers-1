@@ -6,115 +6,12 @@ import pygame
 import sys
 import interface2
 import math
-import time
-import pickle
 
-SEARCH_DEPTH = 3
-
-class MoveNode:
-    def __init__(self, piece, target):
-        self.piece = piece # the piece that is moved
-        self.target = target # the space the piece is moved to
-        self.occurrences = 0
-        self.winrate = 0
-        self.children = [] # stored as moveNodes
-
-    def getChildren(self):
-        return self.children
-
-    def getOccurrences(self):
-        return self.occurrences
- 
-    def getWinRate(self):
-        return self.winrate
-
-    def __str__(self):
-        return("MoveNMode: " + str(self.piece) + "->"+ str(self.target))
-
-    def updateWin(self):
-        self.occurrences += 1
-        self.winrate = self.winrate + ((1 - self.winrate) / self.occurrences)
-
-    def updateLose(self):
-        self.occurrences += 1
-        self.winrate = self.winrate + ((0 - self.winrate) / self.occurrences)
-
-    def addChild(self, newNode):
-        self.children.append(newNode)
-
-    def equals(self, compare):
-        if self.piece == compare.piece and self.target == compare.target:
-            return True
-        return False
-
-# make an opening tree, that is just a root node
-opening_winrates = MoveNode("root", "root") 
-print("made opening tree " + str(opening_winrates))
-
-# load the opening tree if there is one saved
-winrate_file = open('opening_tree.txt', 'rb')
-opening_winrates = pickle.load(winrate_file)
-winrate_file.close()
-
-def saveOpeningTree():
-    winrate_file = open('opening_tree.txt', 'wb')
-    pickle.dump(opening_winrates, winrate_file) # this will just save the opening winrates object generated at startup :)
-    winrate_file.close()
-
-print("here are the moves in the tree :")
-for openingMove in opening_winrates.children:
-    print(str(openingMove) + " wr = " + str(openingMove.getWinRate()) + " K = " + str(openingMove.getOccurrences()))
-
-
-# make a list of all the moves played throughout the game so far
-played_moves = []
-
-currentMove = opening_winrates
-print("====currentMove is " + str(currentMove))
-print(currentMove is opening_winrates)
-
-def findOpeningCandidate():
-    print("finding a candidate for current move = " + str(currentMove))
-    currentMove.occurrences = 2
-    bestCandidate = False
-    bestValuation = False
-    for candidate in currentMove.children:
-        print("looking at candidate: " + str(candidate))
-        if candidate.occurrences == 0:
-            return candidate # we need *some* data on this opening!
-        valuation = (candidate.winrate + (math.sqrt(2) * (math.log(currentMove.occurrences)/candidate.occurrences)))
-        print("valuation is: " + str(valuation))
-        if valuation > bestValuation:
-            bestCandidate = candidate
-            bestValuation = valuation
-
-    return bestCandidate
-
-
-def updateWinrateTree(i):
-    print("winner was player " + str(i))
-    tracer = opening_winrates
-    index = (i - 1) #0 for a player 1 win, 1 for a player 2 win
-    for pMove in played_moves:
-        for stat in tracer.children:
-            if pMove.equals(stat):
-                stat.occurrences += 1
-                if (index % 2):
-                    stat.updateLose()
-                    print("adding a Loss to " + str(stat))
-                else:
-                    stat.updateWin()
-                    print("adding a win to " + str(stat))
-                index += 1
-                tracer = stat
-                break
-
-
+SEARCH_DEPTH = 2
 
 color_light = (202, 203, 213 )
 color_dark = (2, 6, 145)
 def TwoPlayers(p1, p2):
-    global currentMove
     pygame.init()
     import numpy
 
@@ -140,6 +37,7 @@ def TwoPlayers(p1, p2):
         while matrix_index[i] > 0:
             if (i % 2 == 0) and first_time:
                 first_time = False
+                # print(i,j)
                 matrix[i][j] = matrix[16 - i][j] = 0
 
                 matrix_index[i] -= 1
@@ -188,6 +86,7 @@ def TwoPlayers(p1, p2):
 
     # les sauts possibles
     def check_path(path_coor, x, y, moves_array):
+        # print('before:', x, y)
         x2 = x + path_coor[0]
         y2 = y + path_coor[1]
         if [x2, y2] not in moves_array:
@@ -254,14 +153,10 @@ def TwoPlayers(p1, p2):
                 break
         if second == True:
             WriteText('Player 2 had won!', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 130, 50, 'green')
-            updateWinrateTree(2)
-            saveOpeningTree()
             return True
 
         elif first == True :
             WriteText('Player 1 had won!', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 130, 50,'red')
-            updateWinrateTree(1)
-            saveOpeningTree()
             return True
         else:
             return False
@@ -303,16 +198,19 @@ def TwoPlayers(p1, p2):
         # go through the whole board and get each player's pawns
         for i in range(len(state)):
             for j in range(len(state[i])):
-                if state[i][j] == 1:
-                    bigTuple = (i,j)
-                    player_1_pawns.append(bigTuple)
-                elif state[i][j] == 2:
-                    bigTuple = (i,j)
-                    player_2_pawns.append(bigTuple)
+                for k in players:
+                    if state[i][j] == k[0] and k[0] == 1:
+                        bigTuple = (i,j)
+                        player_1_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 2:
+                        bigTuple = (i,j)
+                        player_2_pawns.append(bigTuple)
         #now the pawns arrays have all known pawns
+        print("==== boii ====")
+        print(str(player_1_pawns))
+        print(str(player_2_pawns))
 
         #update for player1
-        
         for goal in player_1_goals:
             closestPawn = (0,0)
             lowestDistance = 100000 #lazy way to represent positive infinity
@@ -321,9 +219,25 @@ def TwoPlayers(p1, p2):
                 if dist < lowestDistance:
                     closestPawn = pawn
                     lowestDistance = dist
+            print("for goal " + str(goal) + " we add " + str(lowestDistance) + " From " + str(closestPawn))
             heuristic_value += lowestDistance
+            print("heuristic value is " + str(heuristic_value))
             player_1_pawns.remove(closestPawn)
 
+        alternate_heuristic = 0
+        #update for player1
+        for goal in player_1_goals:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_1_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            print("for goal " + str(goal) + " we add " + str(lowestDistance) + " From " + str(closestPawn))
+            alternate_heuristic += lowestDistance
+            print("heuristic value is " + str(heuristic_value))
+            player_1_pawns.remove(closestPawn)
 
         player2Val = 0
         #update for player2
@@ -335,71 +249,35 @@ def TwoPlayers(p1, p2):
                 if dist < lowestDistance:
                     closestPawn = pawn
                     lowestDistance = dist
+            print("for goal " + str(goal) + " we subtract " + str(lowestDistance) + " From " + str(closestPawn))
             player2Val -= lowestDistance
+            print("player2Val value is " + str(player2Val))
             player_2_pawns.remove(closestPawn)
 
+        heuristic_value = heuristic_value + player2Val
+        print("heuristic_value is " + str(heuristic_value))
 
-        # re-stock pawns arrays
+        return heuristic_value
+
+
+    def oldHeuristic(state, players):
+        #player array format: [[player id, player goal destination]]
+        temp = 0
         for i in range(len(state)):
             for j in range(len(state[i])):
-                if state[i][j] == 1:
-                    bigTuple = (i,j)
-                    player_1_pawns.append(bigTuple)
-                elif state[i][j] == 2:
-                    bigTuple = (i,j)
-                    player_2_pawns.append(bigTuple)
+                for k in players:
+                    if state[i][j] == k[0] and k[0] == 1:
+                        temp -= math.sqrt((k[1][0]-i)**2 + (k[1][1]-j)**2)
+                    elif state[i][j] == k[0] and k[0] == 2:
+                        temp += math.sqrt((k[1][0]-i)**2 + (k[1][1]-j)**2)
+                    
+                    #if state[i][j] == k[0]:
+                        #temp -= (k[1][0]-i)
+        #returned heuristic is a simple number instead of a vector for two players
+        return temp
 
-        alternate_heuristic = 0
-        #update for player1
-        player_1_goals_inverse = [(16,12), (15,13), (15,11), (14,14), (14,12), (14,10), (13,15), (13,13), (13,11), (13,9)]
-        for goal in player_1_goals_inverse:
-            closestPawn = (0,0)
-            lowestDistance = 100000 #lazy way to represent positive infinity
-            for pawn in player_1_pawns:
-                dist = distance(pawn, goal) 
-                if dist < lowestDistance:
-                    closestPawn = pawn
-                    lowestDistance = dist
-            alternate_heuristic += lowestDistance
-            player_1_pawns.remove(closestPawn)
-
-        
-        if alternate_heuristic > heuristic_value:
-            heuristic_value = alternate_heuristic
-
-        alternate_heuristic = 0
-        #update for player2
-        player_2_goals_inverse = [(0,12), (1,13), (1,11), (2,14), (2,12), (2,10), (3,15), (3,13), (3,11), (3,9)] 
-        for goal in player_2_goals_inverse:
-            closestPawn = (0,0)
-            lowestDistance = 100000 #lazy way to represent positive infinity
-            for pawn in player_2_pawns:
-                dist = distance(pawn, goal) 
-                if dist < lowestDistance:
-                    closestPawn = pawn
-                    lowestDistance = dist
-            alternate_heuristic += lowestDistance
-            player_2_pawns.remove(closestPawn)
-
-
-
-        if alternate_heuristic > abs(player2Val):
-            player2Val = 0 - alternate_heuristic
-        heuristic_value = heuristic_value + player2Val
-
-        # print("current Heuristic: " + (-heuristic_value)
-        return (-heuristic_value)
 
     def alpha_beta_reg(state1, toMoveId):
-        global currentMove #look I'm just gonna use this globally I don't wanna write getters and setters
-
-        bestCandidate = findOpeningCandidate()
-
-        if bestCandidate != False:
-            # UNCOMMENT THIS TO MAKE IT NOT BREAK???
-            # currentMove = bestCandidate
-            return[bestCandidate.target, bestCandidate.piece]
-
         state = copy.deepcopy(state1)
         if (toMoveId == 1):
             value = max_value(state, -Inf, Inf, 1)
@@ -420,6 +298,7 @@ def TwoPlayers(p1, p2):
         initial = [-1, -1]
         for i in p1:
             player_valid_moves = valid_moves(i)
+            print(i, player_valid_moves)
             for a in player_valid_moves:
                 v2 = min_value(move2(state, i, a), alpha, beta, depth+1)
                 if (v2[0] > v):
@@ -444,6 +323,7 @@ def TwoPlayers(p1, p2):
         initial = [-1, -1]
         for i in p2:
             player_valid_moves = valid_moves(i)
+            print(i, player_valid_moves)
             for a in player_valid_moves:
                 v2 = max_value(move2(state, i, a), alpha, beta, depth+1)
                 if (v2[0] < v):
@@ -453,23 +333,19 @@ def TwoPlayers(p1, p2):
                     if (v < beta): beta = v
                 if (v <= alpha): 
                     return [v, move, initial]
-        return [v, move, initial]
+            return [v, move, initial]
 
     def move2(mx, pos, target):
         matrix = copy.deepcopy(mx)
-        if(matrix[target[0]][target[1]] == 0):
-            matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
-            matrix[pos[0]][pos[1]] = 0
-            return matrix
-        else:
-            return mx
+        matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
+        matrix[pos[0]][pos[1]] = 0
+        return matrix
     
     # fonction boutton pour le retour a la fenetre precedente
     def text_objects(text, font):
         textsurface =font.render(text,True , "white")
         return textsurface , textsurface.get_rect()
     def button(msg, x, y, w, h, ic, ac, action=None):
-
         mouse = pygame.mouse.get_pos()
         click = pygame.mouse.get_pressed()
         if x + w > mouse[0] > x and y + h > mouse[1] > y:
@@ -490,61 +366,24 @@ def TwoPlayers(p1, p2):
         if player_index == 1: col = 'red'
         if (winner() == False):
             WriteText('Player ' + str(player_index) + '\'s Turn', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 100, 50, col)
-        else:
-            time.sleep(5)
-            return()
         
         if (player_index == 1 and p1 == "ai"):
-            print("current heuristic is")
             print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             temp = alpha_beta_reg(matrix, 1)
-            print("chose the move: ")
             print(temp)
-
-            # add the move to played moves
-            if len(played_moves) < 4:
-                playedMoveNode = MoveNode(temp[1], temp[0])
-                played_moves.append(playedMoveNode)
-
-                newMove = False
-                for child in currentMove.children:
-                    if child.equals(playedMoveNode):
-                        newMove = child
-                if newMove == False:
-                    currentMove.addChild(playedMoveNode)
-                    newMove = playedMoveNode
-
-                currentMove = newMove
-
             move(temp[1], temp[0])
-            #print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             player_index = (player_index+1) % 3
             if player_index == 0:
                 player_index += 1
             screen.fill(pygame.Color("white"))
             animation()
         elif (player_index == 2 and p2 == "ai"):
-            #print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             temp = alpha_beta_reg(matrix, 2)
             print(temp)
-
-            # add the move to played moves
-            if len(played_moves) < 4:
-                playedMoveNode = MoveNode(temp[1], temp[0])
-                played_moves.append(playedMoveNode)
-
-                newMove = False
-                for child in currentMove.children:
-                    if child.equals(playedMoveNode):
-                        newMove = child
-                if newMove == False:
-                    currentMove.addChild(playedMoveNode)
-                    newMove = playedMoveNode
-
-                currentMove = newMove
-
             move(temp[1], temp[0])
-            #print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             player_index = (player_index+1) % 3
             if player_index == 0:
                 player_index += 1
@@ -575,7 +414,7 @@ def TwoPlayers(p1, p2):
 
                         if clicked_sprites:
                             clicked_token = get_token_coor(clicked_sprites[0].x, clicked_sprites[0].y)
-                            if matrix[clicked_token[0], clicked_token[1]] == player_index:
+                            if matrix[clicked_token[0], clicked_token[1]] == player_index and last_jumped == [-1, -1] or clicked_token == last_jumped:
                                 if clicked_token == last_selected_token:
                                     is_selecting = False
                                     last_selected_token = []
@@ -589,28 +428,16 @@ def TwoPlayers(p1, p2):
                                     screen.fill(pygame.Color("white"))
                                     animation(player_valid_moves,last_selected_token)
                             elif clicked_token in player_valid_moves:
-
-
-
-                                # update played moves array
-                                if len(played_moves) < 4:
-                                    playedMoveNode = MoveNode(last_selected_token, clicked_token)
-                                    played_moves.append(playedMoveNode)
-                                    newMove = False
-                                    for child in currentMove.children:
-                                        if child.equals(playedMoveNode):
-                                            newMove = child
-                                    if newMove == False:
-                                        currentMove.addChild(playedMoveNode)
-                                        newMove = playedMoveNode
-                                    
-                                    currentMove = newMove
-
                                 move(last_selected_token, clicked_token)
-                                #winner() TODO: was this necessary??
-                                player_index = (player_index+1) % 3
-                                if player_index == 0:
-                                    player_index += 1
+                                print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+                                winner()
+                                if (abs(clicked_token[0]-last_selected_token[0]) + abs(clicked_token[1]-last_selected_token[1]) < 4):
+                                    last_jumped = [-1, -1]
+                                    player_index = (player_index+1) % 3
+                                    if player_index == 0:
+                                        player_index += 1
+                                else:
+                                    last_jumped = clicked_token
                                 is_selecting = False
                                 last_selected_token = []
                                 player_valid_moves = []
