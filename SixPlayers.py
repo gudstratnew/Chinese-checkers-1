@@ -31,6 +31,13 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
     move_index = [[-1, -1], [-1, 1], [0, 2], [1, 1], [1, -1], [0, -2]]
     #modification de la matrice
     #changer des -1 par des 0 pour les cases de l'etoile
+    first_aim = [[16, 12], [15, 11], [15, 13], [14, 10], [14, 12], [14, 14], [13, 9], [13, 11], [13, 13], [13, 15]]
+    second_aim = [[12, 0], [12, 2], [12, 4], [12, 6], [11, 1], [11, 3], [11, 5], [10, 2], [10, 4], [9, 3]]
+    third_aim = [[4, 0], [4, 2], [4, 4], [4, 6], [5, 1], [5, 3], [5, 5], [6, 2], [6, 4], [7, 3]]
+    fourth_aim = [[0, 12], [1, 11], [1, 13], [2, 10], [2, 12], [2, 14], [3, 9], [3, 11], [3, 13], [3, 15]]
+    fifth_aim = [[4, 18], [4, 20], [4, 22], [4, 24], [5, 19], [5, 21], [5, 23], [6, 20], [6, 22], [7, 21]]
+    sixth_aim = [[12, 18], [12, 20], [12, 22], [12, 24], [11, 19], [11, 21], [11, 23], [10, 20], [10, 22], [9, 21]]
+
     matrix_index = [1, 2, 3, 4, 13, 12, 11, 10, 9]
     for i in range(9):
         j = 12
@@ -244,11 +251,155 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
         value = max_value(state, toMoveId, -Inf, Inf, 1)
         return [value[1], value[2]]
     
+    def distance(target, destination):
+        # literally just pythagorean theorem :)
+        return math.sqrt((target[0] - destination[0])**2 + (target[1] - destination[1])**2)
+        # return ((target[0] - destination[0]) + (target[1] - destination[1]))
+
+    def heuristic(state, pid):
+        heuristic_value = 0
+        player_1_pawns = []
+        player_2_pawns = []
+        player_3_pawns = []
+        player_4_pawns = []
+        player_5_pawns = []
+        player_6_pawns = []
+
+        players = [[1],[2],[3],[4],[5],[6]]
+        # go through the whole board and get each player's pawns
+        for i in range(len(state)):
+            for j in range(len(state[i])):
+                for k in players:
+                    if state[i][j] == 1:
+                        bigTuple = (i,j)
+                        player_1_pawns.append(bigTuple)
+                    elif state[i][j] == 2:
+                        bigTuple = (i,j)
+                        player_2_pawns.append(bigTuple)
+                    elif state[i][j] == 3:
+                        bigTuple = (i,j)
+                        player_3_pawns.append(bigTuple)
+                    elif state[i][j] == 4:
+                        bigTuple = (i,j)
+                        player_4_pawns.append(bigTuple)
+                    elif state[i][j] == 5:
+                        bigTuple = (i,j)
+                        player_5_pawns.append(bigTuple)
+                    elif state[i][j] == 6:
+                        bigTuple = (i,j)
+                        player_6_pawns.append(bigTuple)
+        #now the pawns arrays have all known pawns
+
+        #update for player1
+        
+        for goal in first_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_1_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            heuristic_value += lowestDistance
+            #print(str(goal),str(closestPawn))
+            player_1_pawns.remove(closestPawn)
+
+        #print("heuristic value is " + str(heuristic_value))
+
+        player2Val = 0
+        #update for player2
+        for goal in second_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_2_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player2Val -= lowestDistance
+            player_2_pawns.remove(closestPawn)
+        
+        player2Val = (player2Val/1.6)
+        
+        #print("player2Val value is " + str(player2Val))
+
+        player3Val = 0
+        
+        for goal in third_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_3_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player3Val -= lowestDistance
+            player_3_pawns.remove(closestPawn)
+        
+        player3Val = (player3Val/1.6)
+        #print("player3Val value is " + str(player3Val))
+
+        player4Val = 0
+
+        for goal in fourth_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_4_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player4Val -= lowestDistance
+            player_4_pawns.remove(closestPawn)
+
+        player5Val = 0
+        for goal in fifth_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_5_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player5Val -= lowestDistance
+            player_5_pawns.remove(closestPawn)
+
+        player5Val = (player5Val/1.6)
+
+        player6Val = 0
+        for goal in fifth_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_6_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player6Val -= lowestDistance
+            player_6_pawns.remove(closestPawn)
+
+        player6Val = (player6Val/1.6)
+        
+        if(pid == 1):
+            return (5*heuristic_value) - abs(player2Val) - abs(player3Val) - abs(player4Val) - abs(player5Val) - abs(player6Val)
+        elif(pid == 2):
+            return (5*abs(player2Val)) - heuristic_value - abs(player3Val) - abs(player4Val) - abs(player5Val) - abs(player6Val)
+        elif(pid == 3):
+            return (5*abs(player3Val)) - heuristic_value - abs(player2Val) - abs(player4Val) - abs(player5Val) - abs(player6Val)
+        elif(pid == 4):
+            return (5*abs(player4Val)) - heuristic_value - abs(player2Val) - abs(player3Val) - abs(player5Val) - abs(player6Val)
+        elif(pid == 5):
+            return (5*abs(player5Val)) - heuristic_value - abs(player2Val) - abs(player3Val) - abs(player4Val) - abs(player6Val)
+        elif(pid == 6):
+            return (5*abs(player6Val)) - heuristic_value - abs(player2Val) - abs(player3Val) - abs(player5Val) - abs(player4Val)
+
     def max_value(state, player, alpha, beta, depth):
         p = []
         temp = player
         temp = (temp) % 7
         print(temp)
+        if(temp == 0):
+            temp = 1
         for i in range(len(state)):
             for j in range(len(state[i])):
                 if state[i][j] == temp:

@@ -236,10 +236,10 @@ def TreePlayers(p1, p2, p3):
                     closestPawn = pawn
                     lowestDistance = dist
             heuristic_value += lowestDistance
-            print(str(goal),str(closestPawn))
+            #print(str(goal),str(closestPawn))
             player_1_pawns.remove(closestPawn)
 
-        print("heuristic value is " + str(heuristic_value))
+        #print("heuristic value is " + str(heuristic_value))
 
         player2Val = 0
         #update for player2
@@ -256,7 +256,7 @@ def TreePlayers(p1, p2, p3):
 
         
         player2Val = (player2Val/1.6)
-        print("player2Val value is " + str(player2Val))
+        #print("player2Val value is " + str(player2Val))
 
         player3Val = 0
         #update for player2
@@ -272,7 +272,7 @@ def TreePlayers(p1, p2, p3):
             player_3_pawns.remove(closestPawn)
         
         player3Val = (player3Val/1.6)
-        print("player3Val value is " + str(player3Val))
+        #print("player3Val value is " + str(player3Val))
         # re-stock pawns arrays
 
         for i in range(len(state)):
@@ -288,14 +288,68 @@ def TreePlayers(p1, p2, p3):
                         bigTuple = (i,j)
                         player_3_pawns.append(bigTuple)
 
+        player1_inverse = [[16, 12], [15, 13], [15, 11], [14, 14], [14, 12], [14, 10], [13, 15], [13, 13], [13, 11],[13, 9]]
+        player2_inverse = [[4, 6], [4, 4], [4, 2], [4, 0], [5, 5], [5, 3], [5, 1], [6, 4], [6, 2], [7, 3]]
+        player3_inverse = [[4, 24], [4, 22], [4, 20], [4, 18], [5, 23], [5, 21], [5, 19], [6, 22], [6, 20], [7, 21]]
+
+        
+        player1Val_a = 0
+        for goal in player1_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_1_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player1Val_a += lowestDistance
+            player_1_pawns.remove(closestPawn)
+
+        if(player1Val_a > heuristic_value):
+           heuristic_value = player1Val_a
+
+        player2Val_a = 0
+        for goal in player2_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_2_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player2Val_a += lowestDistance
+            player_2_pawns.remove(closestPawn)
+
+        player2Val_a = player2Val_a/1.6
+
+        if(abs(player2Val_a) > abs(player2Val)):
+            player2Val = player2Val_a
+
+        player3Val_a = 0
+        for goal in player3_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_3_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player3Val_a += lowestDistance
+            player_3_pawns.remove(closestPawn)
+
+        player3Val_a = player3Val_a/1.6
+
+        
+        if(abs(player3Val_a) > abs(player3Val)):
+            player3Val = player3Val_a
+        
+
         if(pid == 1):
-            return (2*heuristic_value) - abs(player2Val) - abs(player3Val)
+            return (3*heuristic_value) - abs(player2Val) - abs(player3Val)
         elif(pid == 2):
-            return (2*abs(player2Val)) - heuristic_value - abs(player3Val)
+            return (3*abs(player2Val)) - heuristic_value - abs(player3Val)
         elif(pid == 3):
-            return (2*abs(player3Val)) - heuristic_value - abs(player2Val)
-        else:
-            return (2*heuristic_value) - abs(player2Val) - abs(player3Val)
+            return (3*abs(player3Val)) - heuristic_value - abs(player2Val)
 
 
     def alpha_beta_reg(state1, toMoveId):
@@ -312,7 +366,8 @@ def TreePlayers(p1, p2, p3):
         p = []
         temp = player
         temp = (temp) % 4
-        print(temp)
+        if(temp == 0):
+            temp = 1
         for i in range(len(state)):
             for j in range(len(state[i])):
                 if state[i][j] == temp:
@@ -324,7 +379,6 @@ def TreePlayers(p1, p2, p3):
         initial = [-1, -1]
         for i in p:
             player_valid_moves = valid_moves(i)
-            print(i, player_valid_moves)
             for a in player_valid_moves:
                 v2 = max_value(move2(state, i, a), temp + 1, alpha, beta, depth+1)
                 if (v2[0] > v):
@@ -374,33 +428,33 @@ def TreePlayers(p1, p2, p3):
             animation()
             pygame.time.wait(9999999)
         if (player_index == 1 and p1 == "ai"):
-            print(heuristic(matrix, 1))
+            #print(heuristic(matrix, 1))
             temp = alpha_beta_reg(matrix, 1)
-            print(temp)
+            #print(temp)
             move(temp[1], temp[0])
-            print(heuristic(matrix, 1))
+            #print(heuristic(matrix, 1))
             player_index = (player_index+1) % 4
             if player_index == 0:
                 player_index += 1
             screen.fill(pygame.Color("white"))
             animation()
         elif (player_index == 2 and p2 == "ai"):
-            print(heuristic(matrix, 2))
+            #print(heuristic(matrix, 2))
             temp = alpha_beta_reg(matrix, 2)
-            print(temp)
+            #print(temp)
             move(temp[1], temp[0])
-            print(heuristic(matrix, 2))
+            #print(heuristic(matrix, 2))
             player_index = (player_index+1) % 4
             if player_index == 0:
                 player_index += 1
             screen.fill(pygame.Color("white"))
             animation()
         elif (player_index == 3 and p3 == "ai"):
-            print(heuristic(matrix, 3))
+            #print(heuristic(matrix, 3))
             temp = alpha_beta_reg(matrix, 3)
-            print(temp)
+            #print(temp)
             move(temp[1], temp[0])
-            print(heuristic(matrix, 3))
+            #print(heuristic(matrix, 3))
             player_index = (player_index+1) % 4
             if player_index == 0:
                 player_index += 1

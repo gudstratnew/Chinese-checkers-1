@@ -7,14 +7,14 @@ import FourPlayers
 import SixPlayers
 import os
 
-os.chdir("./Final Project/Chinese-checkers-1")
+#os.chdir("./Final Project/Chinese-checkers-1")
 
 #ai: ai player
 #h: human player
 #TwoPlayers.TwoPlayers("ai", "h")
 
-#ThreePlayers.TreePlayers("h", "h", "ai")
+ThreePlayers.TreePlayers("ai", "ai", "ai")
 
-#FourPlayers.FoorPlayers("h", "h", "h", "h")
+#FourPlayers.FoorPlayers("ai", "ai", "ai", "ai")
 
-SixPlayers.SixPlayers("h", "h", "h", "h", "h", "h")
+#SixPlayers.SixPlayers("ai", "ai", "ai", "ai", "ai", "ai")

@@ -26,6 +26,11 @@ def FoorPlayers(p1, p2, p3, p4):
     third_player = [[12, 0], [12, 2], [12, 4], [12, 6], [11, 1], [11, 3], [11, 5], [10, 2], [10, 4], [9, 3]]
     forth_player = [[4, 0], [4, 2], [4, 4], [4, 6], [5, 1], [5, 3], [5, 5], [6, 2], [6, 4], [7, 3]]
     # des indexs pour le deplacement
+    first_aim = [[12, 0], [12, 2], [12, 4], [12, 6], [11, 1], [11, 3], [11, 5], [10, 2], [10, 4], [9, 3]]
+    second_aim = [[4, 0], [4, 2], [4, 4], [4, 6], [5, 1], [5, 3], [5, 5], [6, 2], [6, 4], [7, 3]]
+    third_aim = [[4, 18], [4, 20], [4, 22], [4, 24], [5, 19], [5, 21], [5, 23], [6, 20], [6, 22], [7, 21]]
+    fourth_aim = [[12, 18], [12, 20], [12, 22], [12, 24], [11, 19], [11, 21], [11, 23], [10, 20], [10, 22], [9, 21]]
+
 
     move_index = [[-1, -1], [-1, 1], [0, 2], [1, 1], [1, -1], [0, -2]]
     #modification de la matrice
@@ -218,7 +223,9 @@ def FoorPlayers(p1, p2, p3, p4):
         p = []
         temp = player
         temp = (temp) % 5
-        print(temp)
+        #print(temp)
+        if(temp == 0):
+            temp = 1
         for i in range(len(state)):
             for j in range(len(state[i])):
                 if state[i][j] == temp:
@@ -230,7 +237,7 @@ def FoorPlayers(p1, p2, p3, p4):
         initial = [-1, -1]
         for i in p:
             player_valid_moves = valid_moves(i)
-            print(i, player_valid_moves)
+            #print(i, player_valid_moves)
             for a in player_valid_moves:
                 v2 = max_value(move2(state, i, a), temp + 1, alpha, beta, depth+1)
                 if (v2[0] > v):
@@ -241,6 +248,118 @@ def FoorPlayers(p1, p2, p3, p4):
                 if (v >= beta):
                     return [v, move, initial]
         return [v, move, initial]
+
+    def distance(target, destination):
+        # literally just pythagorean theorem :)
+        return math.sqrt((target[0] - destination[0])**2 + (target[1] - destination[1])**2)
+        # return ((target[0] - destination[0]) + (target[1] - destination[1]))
+
+    def heuristic(state, pid):
+        heuristic_value = 0
+        player_1_pawns = []
+        player_2_pawns = []
+        player_3_pawns = []
+        player_4_pawns = []
+
+        players = [[1],[2],[3],[4]]
+        # go through the whole board and get each player's pawns
+        for i in range(len(state)):
+            for j in range(len(state[i])):
+                for k in players:
+                    if state[i][j] == 1:
+                        bigTuple = (i,j)
+                        player_1_pawns.append(bigTuple)
+                    elif state[i][j] == 2:
+                        bigTuple = (i,j)
+                        player_2_pawns.append(bigTuple)
+                    elif state[i][j] == 3:
+                        bigTuple = (i,j)
+                        player_3_pawns.append(bigTuple)
+                    elif state[i][j] == 4:
+                        bigTuple = (i,j)
+                        player_4_pawns.append(bigTuple)
+        #now the pawns arrays have all known pawns
+
+        #update for player1
+        
+        for goal in first_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_1_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            heuristic_value += lowestDistance
+            #print(str(goal),str(closestPawn))
+            player_1_pawns.remove(closestPawn)
+
+        #print("heuristic value is " + str(heuristic_value))
+
+        player2Val = 0
+        #update for player2
+        for goal in second_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_2_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player2Val -= lowestDistance
+            player_2_pawns.remove(closestPawn)
+
+        
+        #print("player2Val value is " + str(player2Val))
+
+        player3Val = 0
+        
+        for goal in third_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_3_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player3Val -= lowestDistance
+            player_3_pawns.remove(closestPawn)
+        
+        #print("player3Val value is " + str(player3Val))
+
+        player4Val = 0
+
+        for goal in fourth_aim:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_4_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player4Val -= lowestDistance
+            player_4_pawns.remove(closestPawn)
+
+        """
+        if(pid == 1):
+            return (3*heuristic_value) - abs(player2Val) - abs(player3Val) - abs(player4Val)
+        elif(pid == 2):
+            return (3*abs(player2Val)) - heuristic_value - abs(player3Val) - abs(player4Val)
+        elif(pid == 3):
+            return (3*abs(player3Val)) - heuristic_value - abs(player2Val) - abs(player4Val)
+        elif(pid == 4):
+            return (3*abs(player4Val)) - heuristic_value - abs(player2Val) - abs(player3Val)
+        """
+        if(pid == 1):
+            return (heuristic_value)
+        elif(pid == 2):
+            return (abs(player2Val))
+        elif(pid == 3):
+            return (abs(player3Val))
+        elif(pid == 4):
+            return (abs(player4Val))
+
+
 
     def move2(mx, pos, target):
         matrix = copy.deepcopy(mx)
@@ -278,44 +397,44 @@ def FoorPlayers(p1, p2, p3, p4):
             WriteText('Player ' + str(player_index) + '\'s Turn', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 100, 50, col)
 
         if (player_index == 1 and p1 == "ai"):
-            print(heuristic(matrix, 1))
+            #print(heuristic(matrix, 1))
             temp = alpha_beta_reg(matrix, 1)
-            print(temp)
+            #print(temp)
             move(temp[1], temp[0])
-            print(heuristic(matrix, 1))
+            #print(heuristic(matrix, 1))
             player_index = (player_index+1) % 5
             if player_index == 0:
                 player_index += 1
             screen.fill(pygame.Color("white"))
             animation()
         elif (player_index == 2 and p2 == "ai"):
-            print(heuristic(matrix, 2))
+            #print(heuristic(matrix, 2))
             temp = alpha_beta_reg(matrix, 2)
-            print(temp)
+            #print(temp)
             move(temp[1], temp[0])
-            print(heuristic(matrix, 2))
+            #print(heuristic(matrix, 2))
             player_index = (player_index+1) % 5
             if player_index == 0:
                 player_index += 1
             screen.fill(pygame.Color("white"))
             animation()
         elif (player_index == 3 and p3 == "ai"):
-            print(heuristic(matrix, 3))
+            #print(heuristic(matrix, 3))
             temp = alpha_beta_reg(matrix, 3)
-            print(temp)
+            #print(temp)
             move(temp[1], temp[0])
-            print(heuristic(matrix, 3))
+            #print(heuristic(matrix, 3))
             player_index = (player_index+1) % 5
             if player_index == 0:
                 player_index += 1
             screen.fill(pygame.Color("white"))
             animation()
         elif (player_index == 4 and p4 == "ai"):
-            print(heuristic(matrix, 4))
+            #print(heuristic(matrix, 4))
             temp = alpha_beta_reg(matrix, 4)
-            print(temp)
+            #print(temp)
             move(temp[1], temp[0])
-            print(heuristic(matrix, 4))
+            #print(heuristic(matrix, 4))
             player_index = (player_index+1) % 5
             if player_index == 0:
                 player_index += 1
