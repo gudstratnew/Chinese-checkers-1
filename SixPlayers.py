@@ -250,7 +250,7 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
     
     def distance(target, destination):
         # literally just pythagorean theorem :)
-        return math.sqrt((target[0] - destination[0])**2 + (target[1] - destination[1])**2)
+        return math.sqrt((target[0] - destination[0])**2 + (target[1]/2 - destination[1]/2)**2)
         # return ((target[0] - destination[0]) + (target[1] - destination[1]))
 
     def heuristic(state, pid):
@@ -315,7 +315,6 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
             player2Val -= lowestDistance
             player_2_pawns.remove(closestPawn)
         
-        player2Val = (player2Val/1.6)
         
         #print("player2Val value is " + str(player2Val))
 
@@ -332,7 +331,6 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
             player3Val -= lowestDistance
             player_3_pawns.remove(closestPawn)
         
-        player3Val = (player3Val/1.6)
         #print("player3Val value is " + str(player3Val))
 
         player4Val = 0
@@ -360,7 +358,6 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
             player5Val -= lowestDistance
             player_5_pawns.remove(closestPawn)
 
-        player5Val = (player5Val/1.6)
 
         player6Val = 0
         for goal in sixth_aim:
@@ -374,24 +371,28 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
             player6Val -= lowestDistance
             player_6_pawns.remove(closestPawn)
 
-        player6Val = (player6Val/1.6)
         
         # re-stock pawns arrays
         for i in range(len(state)):
             for j in range(len(state[i])):
-                for k in players:
-                    if state[i][j] == k[0] and k[0] == 1:
-                        bigTuple = (i,j)
-                        player_1_pawns.append(bigTuple)
-                    elif state[i][j] == k[0] and k[0] == 2:
-                        bigTuple = (i,j)
-                        player_2_pawns.append(bigTuple)
-                    elif state[i][j] == k[0] and k[0] == 3:
-                        bigTuple = (i,j)
-                        player_3_pawns.append(bigTuple)
-                    elif state[i][j] == k[0] and k[0] == 4:
-                        bigTuple = (i,j)
-                        player_4_pawns.append(bigTuple)  
+                if state[i][j] == 1:
+                    bigTuple = (i,j)
+                    player_1_pawns.append(bigTuple)
+                elif state[i][j] == 2:
+                    bigTuple = (i,j)
+                    player_2_pawns.append(bigTuple)
+                elif state[i][j] == 3:
+                    bigTuple = (i,j)
+                    player_3_pawns.append(bigTuple)
+                elif state[i][j] == 4:
+                    bigTuple = (i,j)
+                    player_4_pawns.append(bigTuple)
+                elif state[i][j] == 5:
+                    bigTuple = (i,j)
+                    player_5_pawns.append(bigTuple)
+                elif state[i][j] == 6:
+                    bigTuple = (i,j)
+                    player_6_pawns.append(bigTuple)
 
         player1_inverse = [[16, 12], [15, 13], [15, 11], [14, 14], [14, 12], [14, 10], [13, 15], [13, 13], [13, 11], [13, 9]]
         player2_inverse = [[12, 6], [12, 4], [12, 2], [12, 0], [11, 5], [11, 3], [11, 1], [10, 4], [10, 2], [9, 3]]
@@ -427,7 +428,6 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
             player2Val_a += lowestDistance
             player_2_pawns.remove(closestPawn)
 
-        player2Val_a = player2Val_a/1.6
 
         if(abs(player2Val_a) > abs(player2Val)):
             player2Val = player2Val_a
@@ -444,7 +444,6 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
             player3Val_a += lowestDistance
             player_3_pawns.remove(closestPawn)
 
-        player3Val_a = player3Val_a/1.6
 
         if(abs(player3Val_a) > abs(player3Val)):
             player3Val = player3Val_a
@@ -476,7 +475,6 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
             player5Val_a += lowestDistance
             player_5_pawns.remove(closestPawn)
 
-        player5Val_a = player5Val_a/1.6
 
         if(abs(player5Val_a) > abs(player5Val)):
             player5Val = player5Val_a
@@ -493,7 +491,6 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
             player6Val_a += lowestDistance
             player_6_pawns.remove(closestPawn)
 
-        player6Val_a = player6Val_a/1.6
 
         if(abs(player6Val_a) > abs(player6Val)):
             player6Val = player6Val_a

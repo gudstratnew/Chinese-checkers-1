@@ -15,6 +15,6 @@ import os
 
 #ThreePlayers.TreePlayers("ai", "ai", "ai")
 
-FourPlayers.FoorPlayers("ai", "ai", "ai", "ai")
+#FourPlayers.FoorPlayers("ai", "ai", "ai", "ai")
 
-#SixPlayers.SixPlayers("ai", "ai", "ai", "ai", "ai", "ai")
+SixPlayers.SixPlayers("ai", "ai", "ai", "ai", "ai", "ai")
