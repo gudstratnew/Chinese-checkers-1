@@ -293,7 +293,7 @@ def FoorPlayers(p1, p2, p3, p4):
             heuristic_value += lowestDistance
             #print(str(goal),str(closestPawn))
             player_1_pawns.remove(closestPawn)
-
+        heuristic_value = heuristic_value/1.6
         #print("heuristic value is " + str(heuristic_value))
 
         player2Val = 0
@@ -309,7 +309,7 @@ def FoorPlayers(p1, p2, p3, p4):
             player2Val -= lowestDistance
             player_2_pawns.remove(closestPawn)
 
-        
+        player2Val = player2Val/1.6
         #print("player2Val value is " + str(player2Val))
 
         player3Val = 0
@@ -326,6 +326,7 @@ def FoorPlayers(p1, p2, p3, p4):
             player_3_pawns.remove(closestPawn)
         
         #print("player3Val value is " + str(player3Val))
+        player3Val = player3Val/1.6
 
         player4Val = 0
 
@@ -340,7 +341,98 @@ def FoorPlayers(p1, p2, p3, p4):
             player4Val -= lowestDistance
             player_4_pawns.remove(closestPawn)
 
-        """
+        player4Val = player4Val/1.6
+
+         # re-stock pawns arrays
+        for i in range(len(state)):
+            for j in range(len(state[i])):
+                for k in players:
+                    if state[i][j] == k[0] and k[0] == 1:
+                        bigTuple = (i,j)
+                        player_1_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 2:
+                        bigTuple = (i,j)
+                        player_2_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 3:
+                        bigTuple = (i,j)
+                        player_3_pawns.append(bigTuple)
+                    elif state[i][j] == k[0] and k[0] == 4:
+                        bigTuple = (i,j)
+                        player_4_pawns.append(bigTuple)  
+
+        player1_inverse = [[12, 6], [12, 4], [12, 2], [12, 0], [11, 5], [11, 3], [11, 1], [10, 4], [10, 2], [9, 3]]
+        player2_inverse = [[4, 6], [4, 4], [4, 2], [4, 0], [5, 5], [5, 3], [5, 1], [6, 4], [6, 2], [7, 3]]
+        player3_inverse = [[4, 24], [4, 22], [4, 20], [4, 18], [5, 23], [5, 21], [5, 19], [6, 22], [6, 20], [7, 21]]
+        player4_inverse = [[12, 24], [12, 22], [12, 20], [12, 18], [11, 23], [11, 21], [11, 19], [10, 22], [10, 20], [9, 21]]
+
+        player1Val_a = 0
+        for goal in player1_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_1_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player1Val_a += lowestDistance
+            player_1_pawns.remove(closestPawn)
+
+        player1Val_a = player1Val_a/1.6
+
+        if(player1Val_a > heuristic_value):
+           heuristic_value = player1Val_a
+
+        player2Val_a = 0
+        for goal in player2_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_2_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player2Val_a += lowestDistance
+            player_2_pawns.remove(closestPawn)
+
+        player2Val_a = player2Val_a/1.6
+
+        if(abs(player2Val_a) > abs(player2Val)):
+            player2Val = player2Val_a
+
+        player3Val_a = 0
+        for goal in player3_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_3_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player3Val_a += lowestDistance
+            player_3_pawns.remove(closestPawn)
+
+        player3Val_a = player3Val_a/1.6
+
+        if(abs(player3Val_a) > abs(player3Val)):
+            player3Val = player3Val_a
+
+        player4Val_a = 0
+        for goal in player4_inverse:
+            closestPawn = (0,0)
+            lowestDistance = 100000 #lazy way to represent positive infinity
+            for pawn in player_4_pawns:
+                dist = distance(pawn, goal) 
+                if dist < lowestDistance:
+                    closestPawn = pawn
+                    lowestDistance = dist
+            player4Val_a += lowestDistance
+            player_4_pawns.remove(closestPawn)
+
+        player4Val_a = player4Val_a/1.6
+
+        if(abs(player4Val_a) > abs(player4Val)):
+            player4Val = player4Val_a
+
         if(pid == 1):
             return (3*heuristic_value) - abs(player2Val) - abs(player3Val) - abs(player4Val)
         elif(pid == 2):
@@ -349,15 +441,6 @@ def FoorPlayers(p1, p2, p3, p4):
             return (3*abs(player3Val)) - heuristic_value - abs(player2Val) - abs(player4Val)
         elif(pid == 4):
             return (3*abs(player4Val)) - heuristic_value - abs(player2Val) - abs(player3Val)
-        """
-        if(pid == 1):
-            return (heuristic_value)
-        elif(pid == 2):
-            return (abs(player2Val))
-        elif(pid == 3):
-            return (abs(player3Val))
-        elif(pid == 4):
-            return (abs(player4Val))
 
 
 
