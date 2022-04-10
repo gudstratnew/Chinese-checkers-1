@@ -7,7 +7,7 @@ import sys
 import interface2
 import math
 
-SEARCH_DEPTH = 2
+SEARCH_DEPTH = 3
 
 color_light = (202, 203, 213 )
 color_dark = (2, 6, 145)
@@ -205,9 +205,7 @@ def TwoPlayers(p1, p2):
                     bigTuple = (i,j)
                     player_2_pawns.append(bigTuple)
         #now the pawns arrays have all known pawns
-        print("==== boii ====")
-        print(str(player_1_pawns))
-        print(str(player_2_pawns))
+        #print("==== boii ====")
 
         #update for player1
         
@@ -222,7 +220,7 @@ def TwoPlayers(p1, p2):
             heuristic_value += lowestDistance
             player_1_pawns.remove(closestPawn)
 
-        print("heuristic value is " + str(heuristic_value))
+        #print("heuristic value is " + str(heuristic_value))
 
         player2Val = 0
         #update for player2
@@ -237,7 +235,7 @@ def TwoPlayers(p1, p2):
             player2Val -= lowestDistance
             player_2_pawns.remove(closestPawn)
 
-        print("player2Val value is " + str(player2Val))
+        #print("player2Val value is " + str(player2Val))
 
         # re-stock pawns arrays
         for i in range(len(state)):
@@ -263,13 +261,13 @@ def TwoPlayers(p1, p2):
             alternate_heuristic += lowestDistance
             player_1_pawns.remove(closestPawn)
 
-        print("ALTERNATE heuristic value is " + str(alternate_heuristic))
+        #print("ALTERNATE heuristic value is " + str(alternate_heuristic))
         
         if alternate_heuristic > heuristic_value:
-            print("========== CHANGING TH E BOI 1=========")
+            #print("========== CHANGING TH E BOI 1=========")
             heuristic_value = alternate_heuristic
-        else:
-            print("which is less than this other heuristic")
+        #else:
+            #print("which is less than this other heuristic")
 
         alternate_heuristic = 0
         #update for player2
@@ -286,18 +284,18 @@ def TwoPlayers(p1, p2):
             player_2_pawns.remove(closestPawn)
 
 
-        print("ALTERNATE heuristic value for p2 is " + str(alternate_heuristic))
+        #print("ALTERNATE heuristic value for p2 is " + str(alternate_heuristic))
 
         if alternate_heuristic > abs(player2Val):
-            print("========== CHANGING TH E BOI 2=========")
+            #print("========== CHANGING TH E BOI 2=========")
             player2Val = 0 - alternate_heuristic
-        else:
-            print(str(alternate_heuristic))
-            print(str(player2Val))
-            print("which is less than this other heuristic")
+        #else:
+            #print(str(alternate_heuristic))
+            #print(str(player2Val))
+            #print("which is less than this other heuristic")
 
         heuristic_value = heuristic_value + player2Val
-        print("heuristic_value is " + str(heuristic_value))
+        #print("heuristic_value is " + str(heuristic_value))
 
         return (-heuristic_value)
 
@@ -340,7 +338,7 @@ def TwoPlayers(p1, p2):
         initial = [-1, -1]
         for i in p1:
             player_valid_moves = valid_moves(i)
-            print(i, player_valid_moves)
+            #print(i, player_valid_moves)
             for a in player_valid_moves:
                 v2 = min_value(move2(state, i, a), alpha, beta, depth+1)
                 if (v2[0] > v):
@@ -365,7 +363,7 @@ def TwoPlayers(p1, p2):
         initial = [-1, -1]
         for i in p2:
             player_valid_moves = valid_moves(i)
-            print(i, player_valid_moves)
+            #print(i, player_valid_moves)
             for a in player_valid_moves:
                 v2 = max_value(move2(state, i, a), alpha, beta, depth+1)
                 if (v2[0] < v):
@@ -379,9 +377,12 @@ def TwoPlayers(p1, p2):
 
     def move2(mx, pos, target):
         matrix = copy.deepcopy(mx)
-        matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
-        matrix[pos[0]][pos[1]] = 0
-        return matrix
+        if(matrix[target[0]][target[1]] == 0):
+            matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
+            matrix[pos[0]][pos[1]] = 0
+            return matrix
+        else:
+            return mx
     
     # fonction boutton pour le retour a la fenetre precedente
     def text_objects(text, font):
@@ -410,22 +411,22 @@ def TwoPlayers(p1, p2):
             WriteText('Player ' + str(player_index) + '\'s Turn', nb_col * CELL_SIZE - 370, nb_ligne * CELL_SIZE - 100, 50, col)
         
         if (player_index == 1 and p1 == "ai"):
-            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+            #print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             temp = alpha_beta_reg(matrix, 1)
-            print(temp)
+            #print(temp)
             move(temp[1], temp[0])
-            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+            #print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             player_index = (player_index+1) % 3
             if player_index == 0:
                 player_index += 1
             screen.fill(pygame.Color("white"))
             animation()
         elif (player_index == 2 and p2 == "ai"):
-            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+            #print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             temp = alpha_beta_reg(matrix, 2)
-            print(temp)
+            #print(temp)
             move(temp[1], temp[0])
-            print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+            #print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
             player_index = (player_index+1) % 3
             if player_index == 0:
                 player_index += 1
@@ -471,7 +472,7 @@ def TwoPlayers(p1, p2):
                                     animation(player_valid_moves,last_selected_token)
                             elif clicked_token in player_valid_moves:
                                 move(last_selected_token, clicked_token)
-                                print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
+                                #print(heuristic(matrix, [[1, [16, 12]], [2, [0, 12]]]))
                                 winner()
                                 player_index = (player_index+1) % 3
                                 if player_index == 0:

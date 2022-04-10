@@ -390,9 +390,12 @@ def TreePlayers(p1, p2, p3):
 
     def move2(mx, pos, target):
         matrix = copy.deepcopy(mx)
-        matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
-        matrix[pos[0]][pos[1]] = 0
-        return matrix
+        if(matrix[target[0]][target[1]] == 0):
+            matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
+            matrix[pos[0]][pos[1]] = 0
+            return matrix
+        else:
+            return mx
     
     # fonction boutton pour le retour a la fenetre precedente
     def text_objects(text, font):

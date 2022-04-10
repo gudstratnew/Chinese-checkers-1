@@ -122,9 +122,14 @@ def SixPlayers(p1, p2, p3, p4, p5, p6):
                                     check_path(move_index[j], x3, y3, moves_array)
 
     #pour faire le mouvement
-    def move(pos, target):
-        matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
-        matrix[pos[0]][pos[1]] = 0
+    def move2(mx, pos, target):
+        matrix = copy.deepcopy(mx)
+        if(matrix[target[0]][target[1]] == 0):
+            matrix[target[0]][target[1]] = matrix[pos[0]][pos[1]]
+            matrix[pos[0]][pos[1]] = 0
+            return matrix
+        else:
+            return mx
 
         # les coordonnees parraport a la grille
     def get_token_coor(x, y):
